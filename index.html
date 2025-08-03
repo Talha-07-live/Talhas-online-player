@@ -63,7 +63,12 @@
 
   <script src="https://cdn.plyr.io/3.7.2/plyr.js"></script>
   <script>
-    const rawKey = 'Talha<watch>what!'; // 32 chars = 256-bit key
+    const rawKey = new Uint8Array([
+      84,  97, 108, 104,  97, 115,  83, 117,
+      112, 101, 114,  83, 101,  99, 114, 101,
+      116,  75, 101, 121,  49,  50,  51,  52,
+      53,  54,  55,  56,  57,  48,  49,  50
+    ]); // Same 256-bit key
 
     function getParam(name) {
       const url = new URL(window.location.href);
@@ -73,7 +78,7 @@
     async function importKey() {
       return await crypto.subtle.importKey(
         'raw',
-        new TextEncoder().encode(rawKey),
+        rawKey,
         'AES-GCM',
         false,
         ['decrypt']
