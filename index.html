@@ -156,22 +156,25 @@
     }
 
     window.onload = setupPlayer;
-
-    // Auto-rotate to landscape on fullscreen (mobile)
-    function lockOrientationOnFullscreen() {
-      const player = document.getElementById('player');
-      player.addEventListener('fullscreenchange', async () => {
-        if (document.fullscreenElement && screen.orientation && screen.orientation.lock) {
-          try {
-            await screen.orientation.lock('landscape');
-          } catch (e) {
-            console.warn('Orientation lock not supported:', e);
-          }
-        }
-      });
-    }
-    lockOrientationOnFullscreen();
     
+      function enableAutoRotateOnFullscreen(playerElement) {
+        playerElement.addEventListener('play', async () => {
+          const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+          if (isMobile && document.fullscreenEnabled && screen.orientation?.lock) {
+            try {
+              await playerElement.requestFullscreen();
+              await screen.orientation.lock('landscape');
+            } catch (err) {
+              console.warn('Auto-rotate failed:', err.message);
+            }
+          }
+        }, { once: true });
+      }
+      
+    document.addEventListener('DOMContentLoaded', () => {
+      const video = document.getElementById('player');
+      enableAutoRotateOnFullscreen(video);
+    });
   </script>
 </body>
 </html>
