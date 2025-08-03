@@ -50,6 +50,12 @@
       color: #66ffc9cc;
       font-weight: 600;
     }
+    .status.note {
+      font-size: 0.9rem;
+      color: #ff9999;
+      font-style: italic;
+      margin-top: 5px;
+    }
   </style>
 </head>
 <body>
@@ -61,6 +67,7 @@
     </video>
   </div>
   <p class="status" id="status">Loading video...</p>
+  <p class="status note">Note: If the video plays without sound, your browser likely does not support EAC3 audio format. Please download the video to listen with full audio support.</p>
   </div>
   <footer>©2020–2025 Talha's Collection | Made By Talha</footer>
 
@@ -157,24 +164,19 @@
 
     window.onload = setupPlayer;
     
-      function enableAutoRotateOnFullscreen(playerElement) {
-        playerElement.addEventListener('play', async () => {
-          const isMobile = /Mobi|Android/i.test(navigator.userAgent);
-          if (isMobile && document.fullscreenEnabled && screen.orientation?.lock) {
-            try {
-              await playerElement.requestFullscreen();
-              await screen.orientation.lock('landscape');
-            } catch (err) {
-              console.warn('Auto-rotate failed:', err.message);
-            }
+    function lockOrientationOnFullscreen() {
+      const player = document.getElementById('player');
+      player.addEventListener('fullscreenchange', async () => {
+        if (document.fullscreenElement && screen.orientation && screen.orientation.lock) {
+          try {
+            await screen.orientation.lock('landscape');
+          } catch (e) {
+            console.warn('Orientation lock not supported:', e);
           }
-        }, { once: true });
-      }
-      
-    document.addEventListener('DOMContentLoaded', () => {
-      const video = document.getElementById('player');
-      enableAutoRotateOnFullscreen(video);
-    });
+        }
+      });
+    }
+    lockOrientationOnFullscreen();
   </script>
 </body>
 </html>
