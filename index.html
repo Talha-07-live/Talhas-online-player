@@ -4,10 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Talha's Stream</title>
-  <link
-    rel="stylesheet"
-    href="https://cdn.plyr.io/3.7.2/plyr.css"
-  />
+  <link rel="stylesheet" href="https://cdn.plyr.io/3.7.2/plyr.css" />
+  <link rel="icon" href="favicon.png" type="image/png" />
   <style>
     body {
       margin: 0;
@@ -17,30 +15,67 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: space-between;
       min-height: 100vh;
-      overflow: hidden;
       user-select: none;
+      text-align: center;
     }
     h1 {
       margin-top: 20px;
       font-weight: 700;
       font-size: 2.5rem;
-      text-align: center;
       text-shadow: 0 0 10px #00ffa3;
     }
     #player-container {
+      position: relative;
       width: 90%;
       max-width: 900px;
       margin: 30px auto;
+      padding: 10px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
       box-shadow: 0 0 30px #00ffa3aa;
-      border-radius: 12px;
-      overflow: hidden;
+      border-image: linear-gradient(45deg, #00ffa3, #00c6ff, #004e92);
+      border-image-slice: 1;
+      animation: borderColor 5s linear infinite;
+      transform: translateY(50px);
+      opacity: 0;
+      animation: fadeUp 1s ease-out 0.5s forwards, borderColor 5s linear infinite;
+    }
+    @keyframes fadeUp {
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    @keyframes borderColor {
+      0% { border-image-source: linear-gradient(0deg, #00ffa3, #004e92); }
+      100% { border-image-source: linear-gradient(360deg, #004e92, #00ffa3); }
     }
     video {
-      border-radius: 12px;
       width: 100%;
       height: auto;
+      border-radius: 12px;
+      opacity: 0;
+      transition: opacity 0.8s ease-in-out;
+      cursor: url('custom-cursor.png'), auto;
+    }
+    video.loaded {
+      opacity: 1;
+    }
+    #watermark {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      padding: 6px 12px;
+      background: rgba(0, 0, 0, 0.5);
+      color: #00ffa3;
+      font-weight: bold;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      pointer-events: none;
     }
     p.status {
       text-align: center;
@@ -49,26 +84,50 @@
       color: #66ffc9cc;
       font-weight: 600;
     }
+    footer {
+      opacity: 0;
+      animation: fadein 2s ease-in 1.5s forwards;
+      padding: 10px 0;
+      font-size: 0.9rem;
+      color: #aaaaaa;
+    }
+    @keyframes fadein {
+      to { opacity: 1; }
+    }
+    body.dark {
+      background: #121212;
+      color: #ffffff;
+    }
+    .theater {
+      max-width: 100% !important;
+      height: 90vh;
+      margin: 0 auto;
+    }
   </style>
 </head>
 <body>
   <h1>Talha's Stream</h1>
   <div id="player-container">
+    <div id="watermark">Talha's Stream</div>
     <video id="player" controls crossorigin playsinline controlsList="nodownload nofullscreen noremoteplayback">
       <source id="source" src="" type="video/mp4" />
       Sorry, your browser doesn't support embedded videos.
     </video>
+    <p class="status" id="status">Loading video...</p>
   </div>
-  <p class="status" id="status">Loading video...</p>
+  <audio id="bg-music" loop autoplay muted>
+    <source src="your-music.mp3" type="audio/mp3" />
+  </audio>
+  <div>
+    <button onclick="toggleMusic()">🎵 Mute / Unmute</button>
+    <button onclick="toggleDarkMode()">🌓 Toggle Dark Mode</button>
+    <button onclick="toggleTheater()">🎥 Theater Mode</button>
+  </div>
+  <footer>©2020–2025 Talha's Collection | Made By Talha</footer>
 
   <script src="https://cdn.plyr.io/3.7.2/plyr.js"></script>
   <script>
-    const rawKey = new Uint8Array([
-      84,  97, 108, 104,  97, 115,  83, 117,
-      112, 101, 114,  83, 101,  99, 114, 101,
-      116,  75, 101, 121,  49,  50,  51,  52,
-      53,  54,  55,  56,  57,  48,  49,  50
-    ]); // Same 256-bit key
+    const rawKey = new Uint8Array([84, 97, 108, 104, 97, 115, 83, 117, 112, 101, 114, 83, 101, 99, 114, 101, 116, 75, 101, 121, 49, 50, 51, 52, 53, 54, 55, 56, 57, 48, 49, 50]);
 
     function getParam(name) {
       const url = new URL(window.location.href);
@@ -76,13 +135,7 @@
     }
 
     async function importKey() {
-      return await crypto.subtle.importKey(
-        'raw',
-        rawKey,
-        'AES-GCM',
-        false,
-        ['decrypt']
-      );
+      return await crypto.subtle.importKey('raw', rawKey, 'AES-GCM', false, ['decrypt']);
     }
 
     async function decryptData(data) {
@@ -91,20 +144,37 @@
         const iv = fullData.slice(0, 12);
         const encrypted = fullData.slice(12);
         const key = await importKey();
-        const decrypted = await crypto.subtle.decrypt(
-          { name: 'AES-GCM', iv },
-          key,
-          encrypted
-        );
+        const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, encrypted);
         return new TextDecoder().decode(decrypted);
-      } catch (e) {
+      } catch {
         throw new Error('Decryption failed or invalid data');
       }
     }
 
+    function toggleMusic() {
+      const music = document.getElementById('bg-music');
+      music.muted = !music.muted;
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark');
+    }
+
+    function toggleTheater() {
+      document.getElementById('player-container').classList.toggle('theater');
+    }
+
+    window.addEventListener('scroll', () => {
+      const player = document.getElementById('player-container');
+      if (window.scrollY > 100) player.style.transform = "scale(1.02)";
+      else player.style.transform = "scale(1)";
+    });
+
     async function setupPlayer() {
       const encryptedData = getParam('data');
       const statusEl = document.getElementById('status');
+      const vid = document.getElementById('player');
+
       if (!encryptedData) {
         statusEl.textContent = 'No video data found in URL.';
         return;
@@ -113,13 +183,14 @@
       try {
         const decryptedUrl = await decryptData(encryptedData);
         statusEl.textContent = 'Video loaded successfully. Enjoy!';
-        const sourceEl = document.getElementById('source');
-        sourceEl.src = decryptedUrl;
+        document.getElementById('source').src = decryptedUrl;
 
         const player = new Plyr('#player', {
           controls: [
+            'rewind',
             'play-large',
             'play',
+            'fast-forward',
             'progress',
             'current-time',
             'mute',
@@ -128,23 +199,47 @@
             'fullscreen'
           ],
           settings: ['quality', 'speed', 'loop'],
-          keyboard: { focused: true, global: false }
+          speed: { selected: 1, options: [0.5, 1, 1.5, 2] },
+          loop: { active: false },
+          keyboard: { focused: true, global: false },
+          tooltips: { controls: true },
+          previewThumbnails: {
+            enabled: true,
+            src: 'thumbnails.vtt'
+          },
+          pip: true
         });
+
+        player.on('ready', () => {
+          const rewindBtn = document.querySelector('.plyr__control[data-plyr="rewind"]');
+          const forwardBtn = document.querySelector('.plyr__control[data-plyr="fast-forward"]');
+
+          rewindBtn?.addEventListener('click', () => {
+            player.currentTime = Math.max(0, player.currentTime - 10);
+          });
+          forwardBtn?.addEventListener('click', () => {
+            player.currentTime = Math.min(player.duration, player.currentTime + 10);
+          });
+        });
+
+        const lastTime = localStorage.getItem('lastTime');
+        if (lastTime) vid.currentTime = parseFloat(lastTime);
+        vid.addEventListener('timeupdate', () => {
+          localStorage.setItem('lastTime', vid.currentTime);
+        });
+
+        vid.addEventListener('canplay', () => vid.classList.add('loaded'));
+        vid.addEventListener('pause', () => vid.style.opacity = 0.6);
+        vid.addEventListener('play', () => vid.style.opacity = 1);
+
         document.getElementById('player').load();
         player.play();
 
-        // Disable right-click on video
         document.getElementById('player').addEventListener('contextmenu', e => e.preventDefault());
 
-        // Disable certain keyboard shortcuts (F12, Ctrl+Shift+I, Ctrl+U)
         window.addEventListener('keydown', e => {
-          if (
-            e.key === 'F12' ||
-            (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
-            (e.ctrlKey && e.key === 'U')
-          ) {
+          if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I', 'J'].includes(e.key)) || (e.ctrlKey && e.key === 'U')) {
             e.preventDefault();
-            return false;
           }
         });
       } catch (err) {
