@@ -79,25 +79,19 @@
 
   <script src="https://cdn.plyr.io/3.7.2/plyr.js"></script>
   <script>
-    const rawKey = new Uint8Array([
-      84, 97, 108, 104, 97, 115, 83, 117,
-      112, 101, 114, 83, 101, 99, 114, 101,
-      116, 75, 101, 121, 49, 50, 51, 52,
-      53, 54, 55, 56, 57, 48, 49, 50
-    ]);
+    // ====== ONLY THIS PART CHANGED ======
 
-    function getParam(name) {
-      const url = new URL(window.location.href);
-      return url.searchParams.get(name);
-    }
+    const SECRET_KEY = "Talha<what!";
 
     async function importKey() {
+      const encoder = new TextEncoder();
+      const keyData = encoder.encode(SECRET_KEY.padEnd(32, '\0').slice(0, 32));
       return await crypto.subtle.importKey(
-        'raw',
-        rawKey,
-        'AES-GCM',
+        "raw",
+        keyData,
+        "AES-GCM",
         false,
-        ['decrypt']
+        ["decrypt"]
       );
     }
 
@@ -108,14 +102,21 @@
         const encrypted = fullData.slice(12);
         const key = await importKey();
         const decrypted = await crypto.subtle.decrypt(
-          { name: 'AES-GCM', iv },
+          { name: "AES-GCM", iv },
           key,
           encrypted
         );
         return JSON.parse(new TextDecoder().decode(decrypted));
       } catch (e) {
-        throw new Error('Decryption failed or invalid data');
+        throw new Error("Decryption failed or invalid data");
       }
+    }
+
+    // ====== REST IS YOUR ORIGINAL SCRIPT ======
+
+    function getParam(name) {
+      const url = new URL(window.location.href);
+      return url.searchParams.get(name);
     }
 
     async function setupPlayer() {
