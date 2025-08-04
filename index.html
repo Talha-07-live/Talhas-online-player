@@ -2,83 +2,204 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Talha's Stream</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css" />
+  <link rel="icon" href="https://s10.gifyu.com/images/SrMU9.png" />
+  <link rel="stylesheet" href="https://cdn.plyr.io/3.7.2/plyr.css" />
   <style>
     body {
-      background-color: #111;
-      color: white;
-      font-family: sans-serif;
       margin: 0;
-      padding: 20px;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: white;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+      user-select: none;
+    }
+    h1 {
+      margin-top: 20px;
+      font-weight: 700;
+      font-size: 2.5rem;
       text-align: center;
+      text-shadow: 0 0 10px #00ffa3;
     }
-    #video-name {
-      font-size: 1.4rem;
-      margin-bottom: 1rem;
-    }
-    .plyr__video-wrapper {
+    #player-container {
+      width: 90%;
+      max-width: 900px;
+      margin: 30px auto;
+      box-shadow: 0 0 30px #00ffa3aa;
       border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
     }
     video {
+      border-radius: 12px;
       width: 100%;
       height: auto;
-      max-width: 960px;
+    }
+    p.status {
+      text-align: center;
+      font-size: 1rem;
+      margin-top: 15px;
+      color: #66ffc9cc;
+      font-weight: 600;
+    }
+    .status.note {
+      font-size: 1rem;
+      color: #ff9999;
+      font-style: italic;
+      margin-top: 5px;
     }
   </style>
 </head>
 <body>
+  <h1>Talha's Stream</h1>
+  <div id="player-container">
+    <video id="player" controls playsinline webkit-playsinline>
+      <source id="source" src="" type="video/mp4" />
+      Sorry, your browser doesn't support embedded videos.
+    </video>
+  </div>
+  <p class="status" id="status">Loading video...</p>
+  <p class="status note">Note: If the video plays without sound, your browser likely does not support EAC3 / Audio encoder. Please download the video to listen with full audio support.</p>
+  <footer>©2020–2025 Talha's Collection | Made By Talha</footer>
 
-  <h1 id="video-name">Loading...</h1>
-  <video id="player" controls playsinline></video>
-
-  <script src="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.min.js"></script>
+  <script src="https://cdn.plyr.io/3.7.2/plyr.js"></script>
   <script>
-    // AES-GCM decryption
-    async function decryptPayload(encryptedBase64, keyStr) {
-      const rawKey = new TextEncoder().encode(keyStr);
-      const encrypted = Uint8Array.from(atob(encryptedBase64), c => c.charCodeAt(0));
+    // তোমার 32-byte secret key (string)
+    const keyString = "Talha<what!";
 
-      const iv = encrypted.slice(0, 12);
-      const data = encrypted.slice(12);
+    // String key কে Uint8Array তে রূপান্তর (TextEncoder ব্যবহার)
+    const rawKey = new TextEncoder().encode(keyString);
 
-      const cryptoKey = await crypto.subtle.importKey("raw", rawKey, "AES-GCM", false, ["decrypt"]);
-      const decrypted = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, cryptoKey, data);
-      return new TextDecoder().decode(decrypted);
+    // ইউআরএল থেকে query param নেওয়ার ফাংশন
+    function getParam(name) {
+      const url = new URL(window.location.href);
+      return url.searchParams.get(name);
     }
 
-    // URL থেকে ইনক্রিপ্টেড প্যারাম নিয়ে ভিডিও চালানো
-    async function loadPlayer() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const encrypted = urlParams.get("Talha");
-      if (!encrypted) return;
+    // Crypto key ইমপোর্ট করার ফাংশন
+    async function importKey() {
+      return await crypto.subtle.importKey(
+        'raw',
+        rawKey,
+        'AES-GCM',
+        false,
+        ['decrypt']
+      );
+    }
 
-      const key = "Talha<what!"; // 32 chars
+    // ডিক্রিপ্ট করার ফাংশন
+    async function decryptPayload(data) {
       try {
-        const decryptedJson = await decryptPayload(decodeURIComponent(encrypted), key);
-        const data = JSON.parse(decryptedJson);
+        // Base64 decode
+        const binaryStr = atob(data);
+        const buffer = new Uint8Array(binaryStr.length);
+        for (let i = 0; i < binaryStr.length; i++) {
+          buffer[i] = binaryStr.charCodeAt(i);
+        }
 
-        document.getElementById("video-name").textContent = data.name || "Unknown Video";
-        const videoElement = document.getElementById("player");
+        // IV হলো প্রথম 12 বাইট, বাকিটা এনক্রিপ্টেড ডাটা
+        const iv = buffer.slice(0, 12);
+        const encryptedData = buffer.slice(12);
 
-        const source = document.createElement("source");
-        source.src = data.url;
-        source.type = "video/mp4";
-        videoElement.appendChild(source);
+        // কী ইমপোর্ট
+        const cryptoKey = await importKey();
 
-        const player = new Plyr(videoElement);
-        player.play();
+        // ডিক্রিপ্ট
+        const decryptedBuffer = await crypto.subtle.decrypt(
+          { name: 'AES-GCM', iv },
+          cryptoKey,
+          encryptedData
+        );
 
-      } catch (err) {
-        document.getElementById("video-name").textContent = "Failed to load video: Invalid link";
-        console.error(err);
+        // Text decode করে রিটার্ন
+        return new TextDecoder().decode(decryptedBuffer);
+      } catch (e) {
+        throw new Error('Decryption failed or invalid data');
       }
     }
 
-    loadPlayer();
+    // প্লেয়ার সেটআপ ফাংশন
+    async function setupPlayer() {
+      const encryptedData = getParam('Talha');
+      const statusEl = document.getElementById('status');
+
+      if (!encryptedData) {
+        statusEl.textContent = 'No video data found in URL.';
+        return;
+      }
+
+      try {
+        // ডিক্রিপ্টেড JSON পাওয়া যাবে, যেটা url এবং name রাখবে
+        const decryptedText = await decryptPayload(encryptedData);
+        const data = JSON.parse(decryptedText);
+
+        statusEl.textContent = 'Video loaded successfully. Enjoy!';
+
+        // ভিডিও সোর্স বসাও
+        const sourceEl = document.getElementById('source');
+        sourceEl.src = data.url;
+
+        // শিরোনাম আপডেট করো
+        document.querySelector('h1').textContent = data.name || "Talha's Stream";
+
+        // Plyr প্লেয়ার ইনিশিয়ালাইজ করো
+        const player = new Plyr('#player', {
+          controls: [
+            'play-large',
+            'play',
+            'progress',
+            'current-time',
+            'mute',
+            'volume',
+            'settings',
+            'fullscreen'
+          ],
+          settings: ['quality', 'speed', 'loop'],
+          keyboard: { focused: true, global: false }
+        });
+
+        document.getElementById('player').load();
+        player.play();
+
+        // রাইট-ক্লিক এবং কীবোর্ড শর্টকাট নিষিদ্ধ (F12, Ctrl+Shift+I, Ctrl+U)
+        document.getElementById('player').addEventListener('contextmenu', e => e.preventDefault());
+        window.addEventListener('keydown', e => {
+          if (
+            e.key === 'F12' ||
+            (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
+            (e.ctrlKey && e.key === 'U')
+          ) {
+            e.preventDefault();
+            return false;
+          }
+        });
+      } catch (err) {
+        statusEl.textContent = 'Failed to load video: ' + err.message;
+      }
+    }
+
+    // পেজ লোডের সাথে প্লেয়ার চালু করো
+    window.onload = setupPlayer;
+
+    // ফুলস্ক্রীন হলে ল্যান্ডস্কেপ ওরিয়েন্টেশন লক করার ফাংশন
+    function lockOrientationOnFullscreen() {
+      const player = document.getElementById('player');
+      player.addEventListener('fullscreenchange', async () => {
+        if (document.fullscreenElement && screen.orientation && screen.orientation.lock) {
+          try {
+            await screen.orientation.lock('landscape');
+          } catch (e) {
+            console.warn('Orientation lock not supported:', e);
+          }
+        }
+      });
+    }
+    lockOrientationOnFullscreen();
   </script>
 </body>
 </html>
