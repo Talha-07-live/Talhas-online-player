@@ -5,95 +5,216 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Talha's Stream</title>
   <link rel="icon" href="https://s10.gifyu.com/images/SrMU9.png" />
-  <link rel="stylesheet" href="https://cdn.plyr.io/3.7.2/plyr.css" />
   <style>
-    body {
-      margin: 0;
-      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-      color: white;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* Reset & base */
+    * {
+      box-sizing: border-box;
+    }
+    body, html {
+      margin: 0; padding: 0;
+      height: 100%;
+      background-color: #141414; /* Netflix dark */
+      color: #fff;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      user-select: none;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #player-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 960px;
+      aspect-ratio: 16 / 9;
+      background-color: black;
+      box-shadow: 0 0 40px rgba(0,0,0,0.8);
+      border-radius: 8px;
+      overflow: hidden;
+      font-size: 16px;
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      background: black;
+      display: block;
+      border-radius: 8px;
+      object-fit: contain;
+      filter: brightness(1);
+    }
+
+    /* Controls container */
+    #controls {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(180deg, transparent, rgba(20,20,20,0.9));
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    #player-wrapper:hover #controls,
+    #player-wrapper.controls-visible #controls {
+      opacity: 1;
+    }
+
+    /* Play button (center big) */
+    #big-play-button {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(229, 9, 20, 0.8); /* Netflix red */
+      border-radius: 50%;
+      width: 80px;
+      height: 80px;
+      cursor: pointer;
+      display: flex;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
-      overflow: hidden;
+      transition: background-color 0.3s ease;
+      box-shadow: 0 0 15px rgba(229, 9, 20, 0.7);
+    }
+    #big-play-button:hover {
+      background: rgba(229, 9, 20, 1);
+    }
+    #big-play-button svg {
+      fill: white;
+      width: 30px;
+      height: 30px;
+      margin-left: 5px;
+    }
+
+    /* Control buttons styling */
+    .btn {
+      background: transparent;
+      border: none;
+      color: white;
+      cursor: pointer;
+      margin-right: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
+      border-radius: 4px;
+      transition: background-color 0.2s ease;
       user-select: none;
     }
-    #main-title {
-      margin-top: 20px;
-      font-weight: 700;
-      font-size: 2.5rem;
-      text-align: center;
-      text-shadow: 0 0 15px #00ffa3;
-      color: #00ffa3;
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.15);
     }
-    #file-name {
-      text-align: center;
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: #a0f4c1;
-      margin-top: 4px;
-      user-select: text;
+
+    /* Icons */
+    svg {
+      width: 20px;
+      height: 20px;
+      pointer-events: none;
+      fill: white;
     }
-    #player-container {
-      width: 90%;
-      max-width: 900px;
-      margin: 30px auto;
-      box-shadow: 0 0 30px #00ffa3aa;
-      border-radius: 12px;
-      overflow: hidden;
+
+    /* Progress bar */
+    #progress-container {
+      flex-grow: 1;
+      height: 6px;
+      background: #333;
+      border-radius: 3px;
+      margin: 0 10px;
+      cursor: pointer;
+      position: relative;
     }
-    video {
-      border-radius: 12px;
-      width: 100%;
-      height: auto;
+    #progress {
+      background: #e50914; /* Netflix red */
+      height: 100%;
+      width: 0%;
+      border-radius: 3px;
+      transition: width 0.1s linear;
     }
-    p.status {
-      text-align: center;
-      font-size: 1rem;
-      margin-top: 15px;
-      color: #66ffc9cc;
-      font-weight: 600;
+
+    /* Volume range */
+    #volume-slider {
+      width: 80px;
+      cursor: pointer;
     }
-    .status.note {
-      font-size: 1rem;
-      color: #ff9999;
-      font-style: italic;
-      margin-top: 5px;
+
+    /* Time text */
+    #time-display {
+      font-size: 14px;
+      font-weight: 500;
+      user-select: none;
+      min-width: 70px;
+      text-align: right;
     }
+
+    /* Hide controls on mobile when not focused */
+    @media (hover: none) {
+      #player-wrapper:hover #controls,
+      #player-wrapper.controls-visible #controls {
+        opacity: 1;
+      }
+    }
+
   </style>
 </head>
 <body>
-  <h1 id="main-title">Talha's Stream</h1>
-  <p id="file-name">Loading file name...</p>
 
-  <div id="player-container">
-    <video id="player" controls playsinline webkit-playsinline>
-      <source id="source" src="" type="video/mp4" />
-      Sorry, your browser doesn't support embedded videos.
-    </video>
+  <div id="player-wrapper">
+    <video id="video" preload="metadata" playsinline webkit-playsinline></video>
+
+    <!-- Big center play button -->
+    <button id="big-play-button" aria-label="Play Video" title="Play">
+      <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+        <path d="M8 5v14l11-7z"></path>
+      </svg>
+    </button>
+
+    <!-- Controls -->
+    <div id="controls">
+      <button id="play-pause" class="btn" aria-label="Play/Pause" title="Play/Pause">
+        <svg id="play-icon" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+          <path d="M8 5v14l11-7z"></path>
+        </svg>
+        <svg id="pause-icon" viewBox="0 0 24 24" focusable="false" aria-hidden="true" style="display:none;">
+          <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path>
+        </svg>
+      </button>
+
+      <div id="progress-container" aria-label="Video progress bar" role="slider" tabindex="0" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-valuetext="0%">
+        <div id="progress"></div>
+      </div>
+
+      <div id="time-display">0:00 / 0:00</div>
+
+      <input type="range" id="volume-slider" min="0" max="1" step="0.01" aria-label="Volume control" value="1" />
+
+      <button id="fullscreen-btn" class="btn" aria-label="Toggle fullscreen" title="Fullscreen">
+        <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+          <path d="M7 14h2v3h3v2H7v-5zm10-4h-2V7h-3V5h5v5zm-5 5h3v-3h2v5h-5v-2zM7 7h3v2H7v3H5V7h2z"></path>
+        </svg>
+      </button>
+    </div>
   </div>
-  <p class="status" id="status">Loading video...</p>
-  <p class="status note">
-    Note: If the video plays without sound, your browser likely does not support EAC3 / Audio encoder. Please download the video to listen with full audio support.
-  </p>
-  <footer>©2020–2025 Talha's Collection | Made By Talha</footer>
 
-  <script src="https://cdn.plyr.io/3.7.2/plyr.js"></script>
   <script>
-    // 32-byte secret key string, padded like in script #1
+    // Your 32-byte secret key (pad to 32 bytes)
     const keyString = "Talha<what!".padEnd(32);
     const encoder = new TextEncoder();
     const rawKey = encoder.encode(keyString);
 
-    // Get URL query parameter
+    // Get URL parameter
     function getParam(name) {
       const url = new URL(window.location.href);
       return url.searchParams.get(name);
     }
 
-    // Import crypto key for AES-GCM decrypt (32 bytes)
+    // Import AES-GCM key
     async function importKey() {
       return await crypto.subtle.importKey(
         'raw',
@@ -104,7 +225,7 @@
       );
     }
 
-    // Decrypt Base64 encoded payload (IV + cipher)
+    // Decrypt base64 payload
     async function decryptPayload(data) {
       try {
         const binaryStr = atob(data);
@@ -112,99 +233,183 @@
         for (let i = 0; i < binaryStr.length; i++) {
           buffer[i] = binaryStr.charCodeAt(i);
         }
-
         const iv = buffer.slice(0, 12);
         const encryptedData = buffer.slice(12);
 
         const cryptoKey = await importKey();
-
         const decryptedBuffer = await crypto.subtle.decrypt(
           { name: 'AES-GCM', iv },
           cryptoKey,
           encryptedData
         );
-
         return new TextDecoder().decode(decryptedBuffer);
       } catch (e) {
         throw new Error('Decryption failed or invalid data');
       }
     }
 
-    // Setup video player and UI
+    const video = document.getElementById('video');
+    const bigPlayBtn = document.getElementById('big-play-button');
+    const controls = document.getElementById('controls');
+    const playPauseBtn = document.getElementById('play-pause');
+    const playIcon = document.getElementById('play-icon');
+    const pauseIcon = document.getElementById('pause-icon');
+    const progressContainer = document.getElementById('progress-container');
+    const progressBar = document.getElementById('progress');
+    const timeDisplay = document.getElementById('time-display');
+    const volumeSlider = document.getElementById('volume-slider');
+    const fullscreenBtn = document.getElementById('fullscreen-btn');
+    const playerWrapper = document.getElementById('player-wrapper');
+
+    // Format seconds to mm:ss
+    function formatTime(time) {
+      const mins = Math.floor(time / 60);
+      const secs = Math.floor(time % 60);
+      return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+
+    // Toggle play/pause video
+    function togglePlayPause() {
+      if (video.paused) {
+        video.play();
+      } else {
+        video.pause();
+      }
+    }
+
+    // Update play/pause button icon
+    function updatePlayPauseIcon() {
+      if (video.paused) {
+        playIcon.style.display = 'block';
+        pauseIcon.style.display = 'none';
+        bigPlayBtn.style.display = 'flex';
+      } else {
+        playIcon.style.display = 'none';
+        pauseIcon.style.display = 'block';
+        bigPlayBtn.style.display = 'none';
+      }
+    }
+
+    // Update progress bar and time display
+    function updateProgress() {
+      const percent = (video.currentTime / video.duration) * 100;
+      progressBar.style.width = percent + '%';
+      timeDisplay.textContent = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
+      progressContainer.setAttribute('aria-valuenow', percent.toFixed(0));
+      progressContainer.setAttribute('aria-valuetext', `${formatTime(video.currentTime)} elapsed`);
+    }
+
+    // Seek video on progress bar click
+    function seek(e) {
+      const rect = progressContainer.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const width = rect.width;
+      const seekTime = (clickX / width) * video.duration;
+      video.currentTime = seekTime;
+    }
+
+    // Toggle fullscreen
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        playerWrapper.requestFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    // Show controls on interaction
+    let controlsTimeout;
+    function showControls() {
+      playerWrapper.classList.add('controls-visible');
+      clearTimeout(controlsTimeout);
+      controlsTimeout = setTimeout(() => {
+        if (!video.paused) {
+          playerWrapper.classList.remove('controls-visible');
+        }
+      }, 3000);
+    }
+
+    // Volume change handler
+    function changeVolume() {
+      video.volume = volumeSlider.value;
+    }
+
+    // Disable right click
+    video.addEventListener('contextmenu', e => e.preventDefault());
+
+    // Keyboard shortcuts (play/pause space, mute m, fullscreen f, etc)
+    window.addEventListener('keydown', e => {
+      if (e.target.tagName.toLowerCase() === 'input') return; // ignore inputs
+      switch(e.key.toLowerCase()) {
+        case ' ':
+          e.preventDefault();
+          togglePlayPause();
+          break;
+        case 'm':
+          video.muted = !video.muted;
+          break;
+        case 'f':
+          toggleFullscreen();
+          break;
+        case 'arrowright':
+          video.currentTime = Math.min(video.currentTime + 10, video.duration);
+          break;
+        case 'arrowleft':
+          video.currentTime = Math.max(video.currentTime - 10, 0);
+          break;
+      }
+    });
+
+    // Initialize player after decrypting URL
     async function setupPlayer() {
       const encryptedData = getParam('Talha');
-      const statusEl = document.getElementById('status');
-
       if (!encryptedData) {
-        statusEl.textContent = 'No video data found in URL.';
+        alert('No video data found in URL.');
         return;
       }
-
       try {
         const decryptedText = await decryptPayload(encryptedData);
         const data = JSON.parse(decryptedText);
+        video.src = data.url;
+        video.title = data.name || "Talha's Stream";
 
-        statusEl.textContent = 'Video loaded successfully. Enjoy!';
-
-        const sourceEl = document.getElementById('source');
-        sourceEl.src = data.url;
-
-        // Set main title and file name separately
-        document.getElementById('main-title').textContent = "Talha's Stream";
-        document.getElementById('file-name').textContent = data.name || 'Unknown File';
-
-        const player = new Plyr('#player', {
-          controls: [
-            'play-large',
-            'play',
-            'progress',
-            'current-time',
-            'mute',
-            'volume',
-            'settings',
-            'fullscreen'
-          ],
-          settings: ['quality', 'speed', 'loop'],
-          keyboard: { focused: true, global: false }
+        // Hide big play button on play
+        video.addEventListener('play', updatePlayPauseIcon);
+        video.addEventListener('pause', updatePlayPauseIcon);
+        video.addEventListener('timeupdate', updateProgress);
+        video.addEventListener('loadedmetadata', () => {
+          updateProgress();
+          showControls();
         });
 
-        document.getElementById('player').load();
-        player.play();
+        // Play/Pause controls
+        playPauseBtn.addEventListener('click', togglePlayPause);
+        bigPlayBtn.addEventListener('click', togglePlayPause);
 
-        // Disable right click on video and block some keyboard shortcuts
-        document.getElementById('player').addEventListener('contextmenu', e => e.preventDefault());
-        window.addEventListener('keydown', e => {
-          if (
-            e.key === 'F12' ||
-            (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
-            (e.ctrlKey && e.key === 'U')
-          ) {
-            e.preventDefault();
-            return false;
-          }
-        });
+        // Progress bar seek
+        progressContainer.addEventListener('click', seek);
+
+        // Volume control
+        volumeSlider.addEventListener('input', changeVolume);
+
+        // Fullscreen button
+        fullscreenBtn.addEventListener('click', toggleFullscreen);
+
+        // Show controls on mouse move
+        playerWrapper.addEventListener('mousemove', showControls);
+        playerWrapper.addEventListener('touchstart', showControls);
+
+        // Initially show controls for 3 seconds
+        showControls();
+
       } catch (err) {
-        statusEl.textContent = 'Failed to load video: ' + err.message;
+        alert('Failed to load video: ' + err.message);
       }
     }
 
-    // Run setup on page load
     window.onload = setupPlayer;
 
-    // Lock orientation to landscape when fullscreen on supported devices
-    function lockOrientationOnFullscreen() {
-      const player = document.getElementById('player');
-      player.addEventListener('fullscreenchange', async () => {
-        if (document.fullscreenElement && screen.orientation && screen.orientation.lock) {
-          try {
-            await screen.orientation.lock('landscape');
-          } catch (e) {
-            console.warn('Orientation lock not supported:', e);
-          }
-        }
-      });
-    }
-    lockOrientationOnFullscreen();
   </script>
+
 </body>
 </html>
