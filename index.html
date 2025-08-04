@@ -69,54 +69,48 @@
 
   <script src="https://cdn.plyr.io/3.7.2/plyr.js"></script>
   <script>
-    // তোমার 32-byte secret key (string)
-    const keyString = "Talha<what!";
+    // ৩২ বাইট লম্বা secret key (string), ১ নম্বর স্ক্রিপ্টের মতো padEnd দিয়ে
+    const keyString = "Talha<what!".padEnd(32);
+    const encoder = new TextEncoder();
+    const rawKey = encoder.encode(keyString);
 
-    // String key কে Uint8Array তে রূপান্তর (TextEncoder ব্যবহার)
-    const rawKey = new TextEncoder().encode(keyString);
-
-    // ইউআরএল থেকে query param নেওয়ার ফাংশন
+    // URL থেকে query param নেওয়ার ফাংশন
     function getParam(name) {
       const url = new URL(window.location.href);
       return url.searchParams.get(name);
     }
 
-    // Crypto key ইমপোর্ট করার ফাংশন
+    // Crypto key Import করার ফাংশন (slice করে ৩২ বাইট)
     async function importKey() {
       return await crypto.subtle.importKey(
         'raw',
-        rawKey,
+        rawKey.slice(0, 32),
         'AES-GCM',
         false,
         ['decrypt']
       );
     }
 
-    // ডিক্রিপ্ট করার ফাংশন
+    // ডিক্রিপ্ট করার ফাংশন (Base64 decode, IV, cipher data আলাদা, decrypt)
     async function decryptPayload(data) {
       try {
-        // Base64 decode
         const binaryStr = atob(data);
         const buffer = new Uint8Array(binaryStr.length);
         for (let i = 0; i < binaryStr.length; i++) {
           buffer[i] = binaryStr.charCodeAt(i);
         }
 
-        // IV হলো প্রথম 12 বাইট, বাকিটা এনক্রিপ্টেড ডাটা
         const iv = buffer.slice(0, 12);
         const encryptedData = buffer.slice(12);
 
-        // কী ইমপোর্ট
         const cryptoKey = await importKey();
 
-        // ডিক্রিপ্ট
         const decryptedBuffer = await crypto.subtle.decrypt(
           { name: 'AES-GCM', iv },
           cryptoKey,
           encryptedData
         );
 
-        // Text decode করে রিটার্ন
         return new TextDecoder().decode(decryptedBuffer);
       } catch (e) {
         throw new Error('Decryption failed or invalid data');
