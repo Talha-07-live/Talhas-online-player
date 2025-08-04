@@ -1,186 +1,182 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Talha's Stream</title>
-  <link rel="icon" href="https://s10.gifyu.com/images/SrMU9.png" />
-  <link
-    rel="stylesheet"
-    href="https://cdn.plyr.io/3.7.2/plyr.css"
-  />
-  <style>
-    body {
-      margin: 0;
-      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-      color: white;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      overflow: hidden;
-      user-select: none;
-    }
-    h1 {
-      margin-top: 20px;
-      font-weight: 700;
-      font-size: 2.5rem;
-      text-align: center;
-      text-shadow: 0 0 10px #00ffa3;
-    }
-    #player-container {
-      width: 90%;
-      max-width: 900px;
-      margin: 30px auto;
-      box-shadow: 0 0 30px #00ffa3aa;
-      border-radius: 12px;
-      overflow: hidden;
-    }
-    video {
-      border-radius: 12px;
-      width: 100%;
-      height: auto;
-    }
-    p.status {
-      text-align: center;
-      font-size: 1rem;
-      margin-top: 15px;
-      color: #66ffc9cc;
-      font-weight: 600;
-    }
-    .status.note {
-      font-size: 1rem;
-      color: #ff9999;
-      font-style: italic;
-      margin-top: 5px;
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Talha's Stream</title>
+  <link rel="icon" href="https://s10.gifyu.com/images/SrMU9.png" />
+  <link
+    rel="stylesheet"
+    href="https://cdn.plyr.io/3.7.2/plyr.css"
+  />
+  <style>
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: white;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+      user-select: none;
+    }
+    h1 {
+      margin-top: 20px;
+      font-weight: 700;
+      font-size: 2.5rem;
+      text-align: center;
+      text-shadow: 0 0 10px #00ffa3;
+    }
+    #player-container {
+      width: 90%;
+      max-width: 900px;
+      margin: 30px auto;
+      box-shadow: 0 0 30px #00ffa3aa;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    video {
+      border-radius: 12px;
+      width: 100%;
+      height: auto;
+    }
+    p.status {
+      text-align: center;
+      font-size: 1rem;
+      margin-top: 15px;
+      color: #66ffc9cc;
+      font-weight: 600;
+    }
+    .status.note {
+      font-size: 1rem;
+      color: #ff9999;
+      font-style: italic;
+      margin-top: 5px;
+    }
+  </style>
 </head>
 <body>
-  <h1>Talha's Stream</h1>
-  <div id="player-container">
-    <video id="player" controls playsinline webkit-playsinline>
-      <source id="source" src="" type="video/mp4" />
-      Sorry, your browser doesn't support embedded videos.
-    </video>
-  </div>
-  <p class="status" id="status">Loading video...</p>
-  <p class="status note">Note: If the video plays without sound, your browser likely does not support EAC3 / Audio encoder. Please download the video to listen with full audio support.</p>
-  </div>
+  <h1>Talha's Stream</h1>
+  <div id="player-container">
+    <video id="player" controls playsinline webkit-playsinline>
+      <source id="source" src="" type="video/mp4" />
+      Sorry, your browser doesn't support embedded videos.
+    </video>
+  </div>
+  <p class="status" id="status">Loading video...</p>
+  <p class="status note">Note: If the video plays without sound, your browser likely does not support EAC3 / Audio encoder. Please download the video to listen with full audio support.</p>
+  </div>
   <footer>©2020–2025 Talha's Collection | Made By Talha</footer>
 
-  <script src="https://cdn.plyr.io/3.7.2/plyr.js"></script>
-  <script>
-    const rawKey = new Uint8Array([
-      84,  97, 108, 104,  97, 115,  83, 117,
-      112, 101, 114,  83, 101,  99, 114, 101,
-      116,  75, 101, 121,  49,  50,  51,  52,
-      53,  54,  55,  56,  57,  48,  49,  50
-    ]); // Same 256-bit key
+  <script src="https://cdn.plyr.io/3.7.2/plyr.js"></script>
+  <script>
+    const rawKey = new Uint8Array([
+      84,  97, 108, 104,  97, 115,  83, 117,
+      112, 101, 114,  83, 101,  99, 114, 101,
+      116,  75, 101, 121,  49,  50,  51,  52,
+      53,  54,  55,  56,  57,  48,  49,  50
+    ]); // Same 256-bit key
 
-    function getParam(name) {
-      const url = new URL(window.location.href);
-      return url.searchParams.get(name);
-    }
+    function getParam(name) {
+      const url = new URL(window.location.href);
+      return url.searchParams.get(name);
+    }
 
-    async function importKey() {
-      return await crypto.subtle.importKey(
-        'raw',
-        rawKey,
-        'AES-GCM',
-        false,
-        ['decrypt']
-      );
-    }
+    async function importKey() {
+      return await crypto.subtle.importKey(
+        'raw',
+        rawKey,
+        'AES-GCM',
+        false,
+        ['decrypt']
+      );
+    }
 
-    async function decryptData(data) {
-      try {
-        const fullData = Uint8Array.from(atob(data), c => c.charCodeAt(0));
-        const iv = fullData.slice(0, 12);
-        const encrypted = fullData.slice(12);
-        const key = await importKey();
-        const decrypted = await crypto.subtle.decrypt(
-          { name: 'AES-GCM', iv },
-          key,
-          encrypted
-        );
-        return new TextDecoder().decode(decrypted);
-      } catch (e) {
-        throw new Error('Decryption failed or invalid data');
-      }
-    }
+    async function decryptData(data) {
+      try {
+        const fullData = Uint8Array.from(atob(data), c => c.charCodeAt(0));
+        const iv = fullData.slice(0, 12);
+        const encrypted = fullData.slice(12);
+        const key = await importKey();
+        const decrypted = await crypto.subtle.decrypt(
+          { name: 'AES-GCM', iv },
+          key,
+          encrypted
+        );
+        return new TextDecoder().decode(decrypted);
+      } catch (e) {
+        throw new Error('Decryption failed or invalid data');
+      }
+    }
 
-    async function setupPlayer() {
-      const encryptedData = getParam('Talha');
-      const statusEl = document.getElementById('status');
-      if (!encryptedData) {
-        statusEl.textContent = 'No video data found in URL.';
-        return;
-      }
+    async function setupPlayer() {
+      const encryptedData = getParam('Talha');
+      const statusEl = document.getElementById('status');
+      if (!encryptedData) {
+        statusEl.textContent = 'No video data found in URL.';
+        return;
+      }
 
-      try {
-        const decryptedText = await decryptData(encryptedData);
-        const data = JSON.parse(decryptedText);
+      try {
+        const decryptedUrl = await decryptData(encryptedData);
+        statusEl.textContent = 'Video loaded successfully. Enjoy!';
+        const sourceEl = document.getElementById('source');
+        sourceEl.src = decryptedUrl;
 
-        statusEl.textContent = 'Video loaded successfully. Enjoy!';
-        const sourceEl = document.getElementById('source');
-        sourceEl.src = data.url;
+        const player = new Plyr('#player', {
+          controls: [
+            'play-large',
+            'play',
+            'progress',
+            'current-time',
+            'mute',
+            'volume',
+            'settings',
+            'fullscreen'
+          ],
+          settings: ['quality', 'speed', 'loop'],
+          keyboard: { focused: true, global: false }
+        });
+        document.getElementById('player').load();
+        player.play();
 
-        document.querySelector('h1').textContent = data.name || "Talha's Stream";
+        // Disable right-click on video
+        document.getElementById('player').addEventListener('contextmenu', e => e.preventDefault());
 
-        const player = new Plyr('#player', {
-          controls: [
-            'play-large',
-            'play',
-            'progress',
-            'current-time',
-            'mute',
-            'volume',
-            'settings',
-            'fullscreen'
-          ],
-          settings: ['quality', 'speed', 'loop'],
-          keyboard: { focused: true, global: false }
-        });
-        document.getElementById('player').load();
-        player.play();
+        // Disable certain keyboard shortcuts (F12, Ctrl+Shift+I, Ctrl+U)
+        window.addEventListener('keydown', e => {
+          if (
+            e.key === 'F12' ||
+            (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
+            (e.ctrlKey && e.key === 'U')
+          ) {
+            e.preventDefault();
+            return false;
+          }
+        });
+      } catch (err) {
+        statusEl.textContent = 'Failed to load video: ' + err.message;
+      }
+    }
 
-        // Disable right-click on video
-        document.getElementById('player').addEventListener('contextmenu', e => e.preventDefault());
-
-        // Disable certain keyboard shortcuts (F12, Ctrl+Shift+I, Ctrl+U)
-        window.addEventListener('keydown', e => {
-          if (
-            e.key === 'F12' ||
-            (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
-            (e.ctrlKey && e.key === 'U')
-          ) {
-            e.preventDefault();
-            return false;
-          }
-        });
-      } catch (err) {
-        statusEl.textContent = 'Failed to load video: ' + err.message;
-      }
-    }
-
-    window.onload = setupPlayer;
-    
-    function lockOrientationOnFullscreen() {
-      const player = document.getElementById('player');
-      player.addEventListener('fullscreenchange', async () => {
-        if (document.fullscreenElement && screen.orientation && screen.orientation.lock) {
-          try {
-            await screen.orientation.lock('landscape');
-          } catch (e) {
-            console.warn('Orientation lock not supported:', e);
-          }
-        }
-      });
-    }
-    lockOrientationOnFullscreen();
-  </script>
+    window.onload = setupPlayer;
+    
+    function lockOrientationOnFullscreen() {
+      const player = document.getElementById('player');
+      player.addEventListener('fullscreenchange', async () => {
+        if (document.fullscreenElement && screen.orientation && screen.orientation.lock) {
+          try {
+            await screen.orientation.lock('landscape');
+          } catch (e) {
+            console.warn('Orientation lock not supported:', e);
+          }
+        }
+      });
+    }
+    lockOrientationOnFullscreen();
+  </script>
 </body>
 </html>
