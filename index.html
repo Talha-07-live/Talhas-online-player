@@ -20,12 +20,21 @@
       overflow: hidden;
       user-select: none;
     }
-    h1 {
+    #main-title {
       margin-top: 20px;
       font-weight: 700;
       font-size: 2.5rem;
       text-align: center;
-      text-shadow: 0 0 10px #00ffa3;
+      text-shadow: 0 0 15px #00ffa3;
+      color: #00ffa3;
+    }
+    #file-name {
+      text-align: center;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #a0f4c1;
+      margin-top: 4px;
+      user-select: text;
     }
     #player-container {
       width: 90%;
@@ -56,7 +65,9 @@
   </style>
 </head>
 <body>
-  <h1>Talha's Stream</h1>
+  <h1 id="main-title">Talha's Stream</h1>
+  <p id="file-name">Loading file name...</p>
+
   <div id="player-container">
     <video id="player" controls playsinline webkit-playsinline>
       <source id="source" src="" type="video/mp4" />
@@ -64,23 +75,25 @@
     </video>
   </div>
   <p class="status" id="status">Loading video...</p>
-  <p class="status note">Note: If the video plays without sound, your browser likely does not support EAC3 / Audio encoder. Please download the video to listen with full audio support.</p>
+  <p class="status note">
+    Note: If the video plays without sound, your browser likely does not support EAC3 / Audio encoder. Please download the video to listen with full audio support.
+  </p>
   <footer>©2020–2025 Talha's Collection | Made By Talha</footer>
 
   <script src="https://cdn.plyr.io/3.7.2/plyr.js"></script>
   <script>
-    // ৩২ বাইট লম্বা secret key (string), ১ নম্বর স্ক্রিপ্টের মতো padEnd দিয়ে
+    // 32-byte secret key string, padded like in script #1
     const keyString = "Talha<what!".padEnd(32);
     const encoder = new TextEncoder();
     const rawKey = encoder.encode(keyString);
 
-    // URL থেকে query param নেওয়ার ফাংশন
+    // Get URL query parameter
     function getParam(name) {
       const url = new URL(window.location.href);
       return url.searchParams.get(name);
     }
 
-    // Crypto key Import করার ফাংশন (slice করে ৩২ বাইট)
+    // Import crypto key for AES-GCM decrypt (32 bytes)
     async function importKey() {
       return await crypto.subtle.importKey(
         'raw',
@@ -91,7 +104,7 @@
       );
     }
 
-    // ডিক্রিপ্ট করার ফাংশন (Base64 decode, IV, cipher data আলাদা, decrypt)
+    // Decrypt Base64 encoded payload (IV + cipher)
     async function decryptPayload(data) {
       try {
         const binaryStr = atob(data);
@@ -117,7 +130,7 @@
       }
     }
 
-    // প্লেয়ার সেটআপ ফাংশন
+    // Setup video player and UI
     async function setupPlayer() {
       const encryptedData = getParam('Talha');
       const statusEl = document.getElementById('status');
@@ -128,20 +141,18 @@
       }
 
       try {
-        // ডিক্রিপ্টেড JSON পাওয়া যাবে, যেটা url এবং name রাখবে
         const decryptedText = await decryptPayload(encryptedData);
         const data = JSON.parse(decryptedText);
 
         statusEl.textContent = 'Video loaded successfully. Enjoy!';
 
-        // ভিডিও সোর্স বসাও
         const sourceEl = document.getElementById('source');
         sourceEl.src = data.url;
 
-        // শিরোনাম আপডেট করো
-        document.querySelector('h1').textContent = data.name || "Talha's Stream";
+        // Set main title and file name separately
+        document.getElementById('main-title').textContent = "Talha's Stream";
+        document.getElementById('file-name').textContent = data.name || 'Unknown File';
 
-        // Plyr প্লেয়ার ইনিশিয়ালাইজ করো
         const player = new Plyr('#player', {
           controls: [
             'play-large',
@@ -160,7 +171,7 @@
         document.getElementById('player').load();
         player.play();
 
-        // রাইট-ক্লিক এবং কীবোর্ড শর্টকাট নিষিদ্ধ (F12, Ctrl+Shift+I, Ctrl+U)
+        // Disable right click on video and block some keyboard shortcuts
         document.getElementById('player').addEventListener('contextmenu', e => e.preventDefault());
         window.addEventListener('keydown', e => {
           if (
@@ -177,10 +188,10 @@
       }
     }
 
-    // পেজ লোডের সাথে প্লেয়ার চালু করো
+    // Run setup on page load
     window.onload = setupPlayer;
 
-    // ফুলস্ক্রীন হলে ল্যান্ডস্কেপ ওরিয়েন্টেশন লক করার ফাংশন
+    // Lock orientation to landscape when fullscreen on supported devices
     function lockOrientationOnFullscreen() {
       const player = document.getElementById('player');
       player.addEventListener('fullscreenchange', async () => {
