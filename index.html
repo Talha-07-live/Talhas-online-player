@@ -111,7 +111,7 @@
         throw new Error('Decryption failed or invalid data');
       }
     }
-
+    
     async function setupPlayer() {
       const encryptedData = getParam('Talha');
       const statusEl = document.getElementById('status');
@@ -119,13 +119,17 @@
         statusEl.textContent = 'No video data found in URL.';
         return;
       }
-
+      
       try {
-        const decryptedUrl = await decryptData(encryptedData);
+        const decryptedText = await decryptData(encryptedData);
+        const data = JSON.parse(decryptedText);
+        
         statusEl.textContent = 'Video loaded successfully. Enjoy!';
         const sourceEl = document.getElementById('source');
-        sourceEl.src = decryptedUrl;
-
+        sourceEl.src = data.url;
+        
+        document.querySelector('h1').textContent = data.name || "Talha's Stream";
+        
         const player = new Plyr('#player', {
           controls: [
             'play-large',
@@ -142,11 +146,9 @@
         });
         document.getElementById('player').load();
         player.play();
-
-        // Disable right-click on video
+        
         document.getElementById('player').addEventListener('contextmenu', e => e.preventDefault());
-
-        // Disable certain keyboard shortcuts (F12, Ctrl+Shift+I, Ctrl+U)
+        
         window.addEventListener('keydown', e => {
           if (
             e.key === 'F12' ||
