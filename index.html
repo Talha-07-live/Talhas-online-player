@@ -5,10 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Talha's Stream</title>
   <link rel="icon" href="https://s10.gifyu.com/images/SrMU9.png" />
-  <link
-    rel="stylesheet"
-    href="https://cdn.plyr.io/3.7.2/plyr.css"
-  />
+  <link rel="stylesheet" href="https://cdn.plyr.io/3.7.2/plyr.css" />
   <style>
     body {
       margin: 0;
@@ -29,6 +26,13 @@
       font-size: 2.5rem;
       text-align: center;
       text-shadow: 0 0 10px #00ffa3;
+    }
+    h2#file-title {
+      margin-top: 5px;
+      font-size: 1.2rem;
+      font-weight: 500;
+      text-align: center;
+      color: #00ffaa;
     }
     #player-container {
       width: 90%;
@@ -60,6 +64,7 @@
 </head>
 <body>
   <h1>Talha's Stream</h1>
+  <h2 id="file-title">Loading filename...</h2>
   <div id="player-container">
     <video id="player" controls playsinline webkit-playsinline>
       <source id="source" src="" type="video/mp4" />
@@ -67,18 +72,19 @@
     </video>
   </div>
   <p class="status" id="status">Loading video...</p>
-  <p class="status note">Note: If the video plays without sound, your browser likely does not support EAC3 / Audio encoder. Please download the video to listen with full audio support.</p>
-  </div>
-  <footer>©2020–2025 Talha's Collection | Made By Talha</footer>
+  <p class="status note">
+    Note: If the video plays without sound, your browser likely does not support EAC3 / Audio encoder. Please download the video to listen with full audio support.
+  </p>
+  <footer>©2020–2025 Talha's Collection | Made By Talha</footer>
 
   <script src="https://cdn.plyr.io/3.7.2/plyr.js"></script>
   <script>
     const rawKey = new Uint8Array([
-      84,  97, 108, 104,  97, 115,  83, 117,
-      112, 101, 114,  83, 101,  99, 114, 101,
-      116,  75, 101, 121,  49,  50,  51,  52,
-      53,  54,  55,  56,  57,  48,  49,  50
-    ]); // Same 256-bit key
+      84, 97, 108, 104, 97, 115, 83, 117,
+      112, 101, 114, 83, 101, 99, 114, 101,
+      116, 75, 101, 121, 49, 50, 51, 52,
+      53, 54, 55, 56, 57, 48, 49, 50
+    ]);
 
     function getParam(name) {
       const url = new URL(window.location.href);
@@ -106,7 +112,7 @@
           key,
           encrypted
         );
-        return new TextDecoder().decode(decrypted);
+        return JSON.parse(new TextDecoder().decode(decrypted));
       } catch (e) {
         throw new Error('Decryption failed or invalid data');
       }
@@ -115,14 +121,22 @@
     async function setupPlayer() {
       const encryptedData = getParam('Talha');
       const statusEl = document.getElementById('status');
+      const titleEl = document.getElementById('file-title');
+
       if (!encryptedData) {
         statusEl.textContent = 'No video data found in URL.';
+        titleEl.textContent = 'Unknown File';
         return;
       }
 
       try {
-        const decryptedUrl = await decryptData(encryptedData);
+        const payload = await decryptData(encryptedData);
+        const decryptedUrl = payload.url;
+        const fileName = payload.name || "Unknown Filename";
+
         statusEl.textContent = 'Video loaded successfully. Enjoy!';
+        titleEl.textContent = fileName;
+
         const sourceEl = document.getElementById('source');
         sourceEl.src = decryptedUrl;
 
@@ -140,13 +154,12 @@
           settings: ['quality', 'speed', 'loop'],
           keyboard: { focused: true, global: false }
         });
+
         document.getElementById('player').load();
         player.play();
 
-        // Disable right-click on video
         document.getElementById('player').addEventListener('contextmenu', e => e.preventDefault());
 
-        // Disable certain keyboard shortcuts (F12, Ctrl+Shift+I, Ctrl+U)
         window.addEventListener('keydown', e => {
           if (
             e.key === 'F12' ||
@@ -157,13 +170,15 @@
             return false;
           }
         });
+
       } catch (err) {
         statusEl.textContent = 'Failed to load video: ' + err.message;
+        titleEl.textContent = 'Error loading filename';
       }
     }
 
     window.onload = setupPlayer;
-    
+
     function lockOrientationOnFullscreen() {
       const player = document.getElementById('player');
       player.addEventListener('fullscreenchange', async () => {
