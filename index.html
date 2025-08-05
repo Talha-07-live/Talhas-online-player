@@ -65,7 +65,7 @@
     footer {
       margin: 15px;
       font-size: 0.8rem;
-      opacity: 1.0;
+      opacity: 0.6;
     }
   </style>
 </head>
@@ -180,13 +180,15 @@
         // Optimize buffer
         optimizeVideoPerformance(document.getElementById('player'));
 
-        // Multiple audio track selector
+        // Multiple audio track selector with language labels
         const videoEl = document.getElementById('player');
         videoEl.addEventListener('loadedmetadata', () => {
           if (videoEl.audioTracks && videoEl.audioTracks.length > 1) {
             const audioMenu = {};
             for (let i = 0; i < videoEl.audioTracks.length; i++) {
-              audioMenu[i] = `Audio Track ${i + 1}`;
+              let label = videoEl.audioTracks[i].label || videoEl.audioTracks[i].language;
+              if (!label) label = `Audio Track ${i + 1}`;
+              audioMenu[i] = label;
             }
 
             player.config.settings.push('audio');
