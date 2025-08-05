@@ -169,18 +169,19 @@
           settings: ['quality', 'speed', 'loop'],
           keyboard: { focused: true, global: false }
         });
-
-        // Keyboard shortcuts for ski
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowRight') {
-          player.forward(10);
-        }
-        if (e.key === 'ArrowLeft') {
-          player.rewind(10);
-        }
         
         //Optimize Buffer
         optimizeVideoPerformance(document.getElementById('player'));
+
+        // Keyboard shortcuts for skip
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'ArrowRight') {
+            player.forward(10);
+          }
+          if (e.key === 'ArrowLeft') {
+            player.rewind(10);
+          }
+        });
 
         // Disable right click on video and block some keyboard shortcuts
         document.getElementById('player').addEventListener('contextmenu', e => e.preventDefault());
