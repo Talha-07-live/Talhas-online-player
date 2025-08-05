@@ -62,6 +62,11 @@
       font-style: italic;
       margin-top: 5px;
     }
+    footer {
+      margin: 15px;
+      font-size: 0.8rem;
+      opacity: 0.6;
+    }
   </style>
 </head>
 <body>
@@ -82,18 +87,16 @@
 
   <script src="https://cdn.plyr.io/3.7.2/plyr.js"></script>
   <script>
-    // 32-byte secret key string, padded like in script #1
+    // 32-byte secret key string
     const keyString = "Talha<what!".padEnd(32);
     const encoder = new TextEncoder();
     const rawKey = encoder.encode(keyString);
 
-    // Get URL query parameter
     function getParam(name) {
       const url = new URL(window.location.href);
       return url.searchParams.get(name);
     }
 
-    // Import crypto key for AES-GCM decrypt (32 bytes)
     async function importKey() {
       return await crypto.subtle.importKey(
         'raw',
@@ -104,18 +107,14 @@
       );
     }
 
-    // Decrypt Base64 encoded payload (IV + cipher)
     async function decryptPayload(data) {
       try {
         const binaryStr = atob(data);
         const buffer = new Uint8Array(binaryStr.length);
-        for (let i = 0; i < binaryStr.length; i++) {
-          buffer[i] = binaryStr.charCodeAt(i);
-        }
+        for (let i = 0; i < binaryStr.length; i++) buffer[i] = binaryStr.charCodeAt(i);
 
         const iv = buffer.slice(0, 12);
         const encryptedData = buffer.slice(12);
-
         const cryptoKey = await importKey();
 
         const decryptedBuffer = await crypto.subtle.decrypt(
@@ -130,7 +129,6 @@
       }
     }
 
-    // Setup video player and UI
     async function setupPlayer() {
       const encryptedData = getParam('Talha');
       const statusEl = document.getElementById('status');
@@ -149,16 +147,15 @@
         const sourceEl = document.getElementById('source');
         sourceEl.src = data.url;
 
-        // Set main title and file name separately
         document.getElementById('main-title').textContent = "Talha's Stream";
         document.getElementById('file-name').textContent = data.name || 'Unknown File';
 
         const player = new Plyr('#player', {
           controls: [
             'play-large',
-            'rewind',
+            'rewind', // 10s back
             'play',
-            'fast-forward',
+            'fast-forward', // 10s forward
             'progress',
             'current-time',
             'mute',
@@ -167,24 +164,46 @@
             'fullscreen'
           ],
           settings: ['quality', 'speed', 'loop'],
-          keyboard: { focused: true, global: false }
+          keyboard: { focused: true, global: false },
+          seekTime: 10
         });
-        
-        //Optimize Buffer
-        //optimizeVideoPerformance(document.getElementById('player'));
 
-        // Keyboard shortcuts for skip
+        document.getElementById('player').load();
+        player.play();
+
+        // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
-          if (e.key === 'ArrowRight') {
-            player.forward(10);
-          }
-          if (e.key === 'ArrowLeft') {
-            player.rewind(10);
+          if (e.key === 'ArrowRight') player.forward(10);
+          if (e.key === 'ArrowLeft') player.rewind(10);
+        });
+
+        // Optimize buffer
+        optimizeVideoPerformance(document.getElementById('player'));
+
+        // Multiple audio track selector
+        const videoEl = document.getElementById('player');
+        videoEl.addEventListener('loadedmetadata', () => {
+          if (videoEl.audioTracks && videoEl.audioTracks.length > 1) {
+            const audioMenu = {};
+            for (let i = 0; i < videoEl.audioTracks.length; i++) {
+              audioMenu[i] = `Audio Track ${i + 1}`;
+            }
+
+            player.config.settings.push('audio');
+            player.config.i18n.audio = 'Audio Track';
+
+            player.on('ready', () => {
+              player.settings.addSetting('audio', audioMenu, (selected) => {
+                for (let i = 0; i < videoEl.audioTracks.length; i++) {
+                  videoEl.audioTracks[i].enabled = (i === parseInt(selected));
+                }
+              });
+            });
           }
         });
 
-        // Disable right click on video and block some keyboard shortcuts
-        document.getElementById('player').addEventListener('contextmenu', e => e.preventDefault());
+        // Disable right click / devtools
+        videoEl.addEventListener('contextmenu', e => e.preventDefault());
         window.addEventListener('keydown', e => {
           if (
             e.key === 'F12' ||
@@ -195,27 +214,34 @@
             return false;
           }
         });
+
       } catch (err) {
         statusEl.textContent = 'Failed to load video: ' + err.message;
       }
     }
 
-    // Run setup on page load
-    window.onload = setupPlayer;
+    // Buffer optimization function
+    function optimizeVideoPerformance(videoElement) {
+      if (!videoElement) return;
+      videoElement.preload = "metadata";
+      videoElement.addEventListener("waiting", () => { videoElement.playbackRate = 0.9; });
+      videoElement.addEventListener("playing", () => { videoElement.playbackRate = 1.0; });
+      const source = videoElement.querySelector("source");
+      if (source && 'fetchPriority' in source) source.fetchPriority = "high";
+    }
 
-    // Lock orientation to landscape when fullscreen on supported devices
+    // Lock to landscape in fullscreen
     function lockOrientationOnFullscreen() {
       const player = document.getElementById('player');
       player.addEventListener('fullscreenchange', async () => {
         if (document.fullscreenElement && screen.orientation && screen.orientation.lock) {
-          try {
-            await screen.orientation.lock('landscape');
-          } catch (e) {
-            console.warn('Orientation lock not supported:', e);
-          }
+          try { await screen.orientation.lock('landscape'); }
+          catch (e) { console.warn('Orientation lock not supported:', e); }
         }
       });
     }
+
+    window.onload = setupPlayer;
     lockOrientationOnFullscreen();
   </script>
 </body>
