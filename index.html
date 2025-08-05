@@ -156,7 +156,9 @@
         const player = new Plyr('#player', {
           controls: [
             'play-large',
+            'rewind',
             'play',
+            'fast-forward',
             'progress',
             'current-time',
             'mute',
@@ -166,6 +168,7 @@
           ],
           settings: ['quality', 'speed', 'loop'],
           keyboard: { focused: true, global: false }
+          seekTime: 10
         });
 
         document.getElementById('player').load();
