@@ -69,7 +69,8 @@
   <p id="file-name">Loading file name...</p>
 
   <div id="player-container">
-    <video id="player" controls playsinline webkit-playsinline poster="https://s10.gifyu.com/images/SrMU9.png">
+    <!-- ADDED preload="metadata" -->
+    <video id="player" controls playsinline webkit-playsinline preload="metadata" poster="https://s10.gifyu.com/images/SrMU9.png">
       <source id="source" src="" type="video/mp4" />
       Sorry, your browser doesn't support embedded videos.
     </video>
@@ -82,18 +83,16 @@
 
   <script src="https://cdn.plyr.io/3.7.2/plyr.js"></script>
   <script>
-    // 32-byte secret key string, padded like in script #1
+    // 32-byte secret key string
     const keyString = "Talha<what!".padEnd(32);
     const encoder = new TextEncoder();
     const rawKey = encoder.encode(keyString);
 
-    // Get URL query parameter
     function getParam(name) {
       const url = new URL(window.location.href);
       return url.searchParams.get(name);
     }
 
-    // Import crypto key for AES-GCM decrypt (32 bytes)
     async function importKey() {
       return await crypto.subtle.importKey(
         'raw',
@@ -104,7 +103,6 @@
       );
     }
 
-    // Decrypt Base64 encoded payload (IV + cipher)
     async function decryptPayload(data) {
       try {
         const binaryStr = atob(data);
@@ -130,6 +128,38 @@
       }
     }
 
+    // ADDED — Fast seek & buffer optimization function
+    function optimizeVideoPerformance(video) {
+      if (video) {
+        video.preload = "metadata";
+        video.autoplay = false;
+
+        video.addEventListener("loadedmetadata", () => {
+          video.currentTime = 0;
+        });
+
+        // Use fastSeek if available
+        video.addEventListener("seeking", () => {
+          if (video.fastSeek) {
+            video.fastSeek(video.currentTime);
+          }
+        });
+
+        // Limit buffer to ~30s ahead
+        video.addEventListener("progress", () => {
+          try {
+            const bufferedEnd = video.buffered.length ? video.buffered.end(video.buffered.length - 1) : 0;
+            if (bufferedEnd - video.currentTime > 30) {
+              video.pause();
+              setTimeout(() => {
+                if (video.paused) video.play().catch(() => {});
+              }, 500);
+            }
+          } catch (e) {}
+        });
+      }
+    }
+
     // Setup video player and UI
     async function setupPlayer() {
       const encryptedData = getParam('Talha');
@@ -149,7 +179,6 @@
         const sourceEl = document.getElementById('source');
         sourceEl.src = data.url;
 
-        // Set main title and file name separately
         document.getElementById('main-title').textContent = "Talha's Stream";
         document.getElementById('file-name').textContent = data.name || 'Unknown File';
 
@@ -171,7 +200,10 @@
         document.getElementById('player').load();
         player.play();
 
-        // Disable right click on video and block some keyboard shortcuts
+        // ADDED — Call optimization
+        optimizeVideoPerformance(document.getElementById('player'));
+
+        // Disable right click & dev tools shortcuts
         document.getElementById('player').addEventListener('contextmenu', e => e.preventDefault());
         window.addEventListener('keydown', e => {
           if (
@@ -188,10 +220,8 @@
       }
     }
 
-    // Run setup on page load
     window.onload = setupPlayer;
 
-    // Lock orientation to landscape when fullscreen on supported devices
     function lockOrientationOnFullscreen() {
       const player = document.getElementById('player');
       player.addEventListener('fullscreenchange', async () => {
