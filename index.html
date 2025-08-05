@@ -15,31 +15,36 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       min-height: 100vh;
-      overflow: hidden;
+      overflow-x: hidden;
       user-select: none;
+      padding: 10px;
+      box-sizing: border-box;
     }
     #main-title {
       margin-top: 20px;
       font-weight: 700;
-      font-size: 2.5rem;
+      font-size: clamp(1.5rem, 4vw, 2.5rem);
       text-align: center;
       text-shadow: 0 0 15px #00ffa3;
       color: #00ffa3;
+      word-wrap: break-word;
     }
     #file-name {
       text-align: center;
-      font-size: 0.9rem;
+      font-size: clamp(0.7rem, 2vw, 1rem);
       font-weight: 550;
       color: #a0f4c1;
       margin-top: 4px;
       user-select: text;
+      word-break: break-word;
+      max-width: 95%;
     }
     #player-container {
-      width: 90%;
+      width: 100%;
       max-width: 900px;
-      margin: 30px auto;
+      margin: 20px auto;
       box-shadow: 0 0 30px #00ffa3aa;
       border-radius: 12px;
       overflow: hidden;
@@ -51,21 +56,26 @@
     }
     p.status {
       text-align: center;
-      font-size: 1rem;
+      font-size: clamp(0.8rem, 2vw, 1rem);
       margin-top: 15px;
       color: #66ffc9cc;
       font-weight: 600;
+      padding: 0 10px;
     }
     .status.note {
-      font-size: 1rem;
+      font-size: clamp(0.75rem, 1.8vw, 1rem);
       color: #ff9999;
       font-style: italic;
       margin-top: 5px;
+      padding: 0 10px;
     }
     footer {
       margin: 15px;
-      font-size: 0.8rem;
+      font-size: clamp(0.7rem, 1.5vw, 0.8rem);
       opacity: 1.0;
+      text-align: center;
+      padding: 0 10px;
+      word-break: break-word;
     }
   </style>
 </head>
@@ -153,9 +163,9 @@
         const player = new Plyr('#player', {
           controls: [
             'play-large',
-            'rewind', // 10s back
+            'rewind',
             'play',
-            'fast-forward', // 10s forward
+            'fast-forward',
             'progress',
             'current-time',
             'mute',
@@ -222,7 +232,6 @@
       }
     }
 
-    // Buffer optimization function
     function optimizeVideoPerformance(videoElement) {
       if (!videoElement) return;
       videoElement.preload = "metadata";
@@ -232,7 +241,6 @@
       if (source && 'fetchPriority' in source) source.fetchPriority = "high";
     }
 
-    // Lock to landscape in fullscreen
     function lockOrientationOnFullscreen() {
       const player = document.getElementById('player');
       player.addEventListener('fullscreenchange', async () => {
