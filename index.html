@@ -173,6 +173,13 @@
 
         document.getElementById('player').load();
         player.play();
+
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'ArrowRight') {
+            player.forward(10);
+          }
+          if (e.key === 'ArrowLeft') {
+            player.rewind(10);
         
         //Optimize Buffer
         optimizeVideoPerformance(document.getElementById('player'));
