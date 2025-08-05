@@ -15,24 +15,23 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start;
+      justify-content: center;
       min-height: 100vh;
       overflow-x: hidden;
       user-select: none;
       padding: 10px;
       box-sizing: border-box;
+      text-align: center;
     }
     #main-title {
-      margin-top: 20px;
+      margin-top: 10px;
       font-weight: 700;
       font-size: clamp(1.5rem, 4vw, 2.5rem);
-      text-align: center;
       text-shadow: 0 0 15px #00ffa3;
       color: #00ffa3;
       word-wrap: break-word;
     }
     #file-name {
-      text-align: center;
       font-size: clamp(0.7rem, 2vw, 1rem);
       font-weight: 550;
       color: #a0f4c1;
@@ -55,7 +54,6 @@
       height: auto;
     }
     p.status {
-      text-align: center;
       font-size: clamp(0.8rem, 2vw, 1rem);
       margin-top: 15px;
       color: #66ffc9cc;
@@ -70,11 +68,9 @@
       padding: 0 10px;
     }
     footer {
-      margin: 15px;
+      margin: 15px 0;
       font-size: clamp(0.7rem, 1.5vw, 0.8rem);
-      opacity: 1.0;
-      text-align: center;
-      padding: 0 10px;
+      opacity: 0.6;
       word-break: break-word;
     }
   </style>
@@ -97,7 +93,6 @@
 
   <script src="https://cdn.plyr.io/3.7.2/plyr.js"></script>
   <script>
-    // 32-byte secret key string
     const keyString = "Talha<what!".padEnd(32);
     const encoder = new TextEncoder();
     const rawKey = encoder.encode(keyString);
@@ -181,16 +176,13 @@
         document.getElementById('player').load();
         player.play();
 
-        // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
           if (e.key === 'ArrowRight') player.forward(10);
           if (e.key === 'ArrowLeft') player.rewind(10);
         });
 
-        // Optimize buffer
         optimizeVideoPerformance(document.getElementById('player'));
 
-        // Multiple audio track selector with language labels
         const videoEl = document.getElementById('player');
         videoEl.addEventListener('loadedmetadata', () => {
           if (videoEl.audioTracks && videoEl.audioTracks.length > 1) {
@@ -214,7 +206,6 @@
           }
         });
 
-        // Disable right click / devtools
         videoEl.addEventListener('contextmenu', e => e.preventDefault());
         window.addEventListener('keydown', e => {
           if (
