@@ -169,7 +169,7 @@
             'pip',
             'fullscreen'
           ],
-          settings: ['quality', 'speed', 'loop', 'audio'], // Audio always visible
+          settings: ['quality', 'speed', 'loop', 'audio'], // Always show audio
           keyboard: { focused: true, global: false },
           seekTime: 10
         });
@@ -195,15 +195,13 @@
               audioMenu[i] = label;
             }
           } else {
-            audioMenu[0] = "No other tracks";
+            audioMenu[0] = "Default Track";
           }
 
           player.on('ready', () => {
             player.settings.addSetting('audio', audioMenu, (selected) => {
-              if (videoEl.audioTracks && videoEl.audioTracks.length > 1) {
-                for (let i = 0; i < videoEl.audioTracks.length; i++) {
-                  videoEl.audioTracks[i].enabled = (i === parseInt(selected));
-                }
+              for (let i = 0; i < videoEl.audioTracks.length; i++) {
+                videoEl.audioTracks[i].enabled = (i === parseInt(selected));
               }
               player.settings.hide();
             });
