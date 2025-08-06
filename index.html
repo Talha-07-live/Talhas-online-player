@@ -169,7 +169,7 @@
             'pip',
             'fullscreen'
           ],
-          settings: ['quality', 'speed', 'loop', 'audio'], // Always show audio
+          settings: ['quality', 'speed', 'loop'], // We will add custom audio setting manually
           keyboard: { focused: true, global: false },
           seekTime: 10
         });
@@ -187,24 +187,37 @@
         const videoEl = document.getElementById('player');
 
         videoEl.addEventListener('loadedmetadata', () => {
-          const audioMenu = {};
-          if (videoEl.audioTracks && videoEl.audioTracks.length > 0) {
-            for (let i = 0; i < videoEl.audioTracks.length; i++) {
-              let label = videoEl.audioTracks[i].label || videoEl.audioTracks[i].language;
-              if (!label) label = `Audio Track ${i + 1}`;
+          const audioTracks = videoEl.audioTracks;
+          let audioMenu = {};
+
+          if (audioTracks && audioTracks.length > 0) {
+            for (let i = 0; i < audioTracks.length; i++) {
+              let label = audioTracks[i].label || audioTracks[i].language || `Track ${i+1}`;
               audioMenu[i] = label;
             }
           } else {
-            audioMenu[0] = "Default Track";
+            audioMenu[0] = 'Default Audio Track';
           }
+
+          // Custom audio track setting injection
+          player.config.settings.push('audio'); // Add audio to settings list
 
           player.on('ready', () => {
             player.settings.addSetting('audio', audioMenu, (selected) => {
-              for (let i = 0; i < videoEl.audioTracks.length; i++) {
-                videoEl.audioTracks[i].enabled = (i === parseInt(selected));
+              if (audioTracks && audioTracks.length > 0) {
+                for (let i = 0; i < audioTracks.length; i++) {
+                  audioTracks[i].enabled = (i === parseInt(selected));
+                }
               }
               player.settings.hide();
             });
+
+            // Set default audio track enabled
+            if (audioTracks && audioTracks.length > 0) {
+              for (let i = 0; i < audioTracks.length; i++) {
+                audioTracks[i].enabled = (i === 0);
+              }
+            }
           });
         });
 
