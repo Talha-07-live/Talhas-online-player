@@ -106,7 +106,7 @@ async function setupPlayer() {
   const statusEl = document.getElementById('status');
 
   if (!encryptedData) {
-    statusEl.textContent = 'No video data found in URL.';
+    statusEl.textContent = 'No video data found in URL. *Contact My Owner "Talha"*';
     return;
   }
 
@@ -114,7 +114,7 @@ async function setupPlayer() {
     const decryptedText = await decryptPayload(encryptedData);
     const data = JSON.parse(decryptedText);
 
-    document.getElementById('file-name').textContent = data.name || 'Unknown File';
+    document.getElementById('file-name').textContent = data.name || 'Unknown File *Contact My Owner "Talha"*';
     const sourceEl = document.getElementById('source');
     sourceEl.src = data.url;
 
