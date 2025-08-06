@@ -169,7 +169,7 @@
             'pip',
             'fullscreen'
           ],
-          settings: ['quality', 'speed', 'loop'], // We'll add custom 'audio' submenu manually
+          settings: ['quality', 'speed', 'loop'], // We will add custom audio setting manually
           keyboard: { focused: true, global: false },
           seekTime: 10
         });
@@ -192,19 +192,17 @@
 
           if (audioTracks && audioTracks.length > 0) {
             for (let i = 0; i < audioTracks.length; i++) {
-              let label = audioTracks[i].label || audioTracks[i].language || `Track ${i + 1}`;
+              let label = audioTracks[i].label || audioTracks[i].language || `Track ${i+1}`;
               audioMenu[i] = label;
             }
           } else {
             audioMenu[0] = 'Default Audio Track';
           }
 
-          // Add "audio" to Plyr settings menu manually and build the submenu UI
-          player.config.settings.push('audio');
+          // Custom audio track setting injection
+          player.config.settings.push('audio'); // Add audio to settings list
 
-          // Wait for Plyr to be ready before adding the setting
           player.on('ready', () => {
-            // Add the custom setting for audio tracks
             player.settings.addSetting('audio', audioMenu, (selected) => {
               if (audioTracks && audioTracks.length > 0) {
                 for (let i = 0; i < audioTracks.length; i++) {
@@ -214,7 +212,7 @@
               player.settings.hide();
             });
 
-            // Enable default first audio track
+            // Set default audio track enabled
             if (audioTracks && audioTracks.length > 0) {
               for (let i = 0; i < audioTracks.length; i++) {
                 audioTracks[i].enabled = (i === 0);
