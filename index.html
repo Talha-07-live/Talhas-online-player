@@ -166,6 +166,7 @@
             'mute',
             'volume',
             'settings',
+            'pip',  // PiP button added
             'fullscreen'
           ],
           settings: ['quality', 'speed', 'loop'],
@@ -193,7 +194,10 @@
               audioMenu[i] = label;
             }
 
-            player.config.settings.push('audio');
+            // Add 'audio' option dynamically
+            if (!player.config.settings.includes('audio')) {
+              player.config.settings.push('audio');
+            }
             player.config.i18n.audio = 'Audio Track';
 
             player.on('ready', () => {
@@ -206,7 +210,9 @@
           }
         });
 
+        // Disable right click
         videoEl.addEventListener('contextmenu', e => e.preventDefault());
+        // Disable Inspect shortcuts
         window.addEventListener('keydown', e => {
           if (
             e.key === 'F12' ||
