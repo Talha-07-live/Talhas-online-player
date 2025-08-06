@@ -166,10 +166,10 @@
             'mute',
             'volume',
             'settings',
-            'pip',  // PiP button added
+            'pip',
             'fullscreen'
           ],
-          settings: ['quality', 'speed', 'loop'],
+          settings: ['quality', 'speed', 'loop', 'audio'], // Audio always visible
           keyboard: { focused: true, global: false },
           seekTime: 10
         });
@@ -185,29 +185,29 @@
         optimizeVideoPerformance(document.getElementById('player'));
 
         const videoEl = document.getElementById('player');
+
         videoEl.addEventListener('loadedmetadata', () => {
-          if (videoEl.audioTracks && videoEl.audioTracks.length > 1) {
-            const audioMenu = {};
+          const audioMenu = {};
+          if (videoEl.audioTracks && videoEl.audioTracks.length > 0) {
             for (let i = 0; i < videoEl.audioTracks.length; i++) {
               let label = videoEl.audioTracks[i].label || videoEl.audioTracks[i].language;
               if (!label) label = `Audio Track ${i + 1}`;
               audioMenu[i] = label;
             }
+          } else {
+            audioMenu[0] = "No other tracks";
+          }
 
-            // Add 'audio' option dynamically
-            if (!player.config.settings.includes('audio')) {
-              player.config.settings.push('audio');
-            }
-            player.config.i18n.audio = 'Audio Track';
-
-            player.on('ready', () => {
-              player.settings.addSetting('audio', audioMenu, (selected) => {
+          player.on('ready', () => {
+            player.settings.addSetting('audio', audioMenu, (selected) => {
+              if (videoEl.audioTracks && videoEl.audioTracks.length > 1) {
                 for (let i = 0; i < videoEl.audioTracks.length; i++) {
                   videoEl.audioTracks[i].enabled = (i === parseInt(selected));
                 }
-              });
+              }
+              player.settings.hide();
             });
-          }
+          });
         });
 
         // Disable right click
