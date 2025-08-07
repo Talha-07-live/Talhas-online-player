@@ -1,288 +1,251 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Talha's Stream</title>
-  <link rel="icon" href="https://s10.gifyu.com/images/SrMU9.png" />
-  <link rel="stylesheet" href="https://cdn.plyr.io/3.7.2/plyr.css" />
-  <style>
-    body {
-      margin: 0;
-      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-      color: white;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      overflow-x: hidden;
-      user-select: none;
-      padding: 10px;
-      box-sizing: border-box;
-      text-align: center;
-    }
-    #main-title {
-      margin-top: 10px;
-      font-weight: 700;
-      font-size: clamp(1.5rem, 4vw, 2.5rem);
-      text-shadow: 0 0 15px #00ffa3;
-      color: #00ffa3;
-      word-wrap: break-word;
-      transition: text-shadow 1s ease-in-out, color 1s ease-in-out;
-    }
-    #file-name {
-      font-size: clamp(0.7rem, 2vw, 1rem);
-      font-weight: 550;
-      color: #a0f4c1;
-      margin-top: 4px;
-      user-select: text;
-      word-break: break-word;
-      max-width: 95%;
-    }
-    #player-container {
-      width: 100%;
-      max-width: 900px;
-      margin: 20px auto;
-      box-shadow: 0 0 30px #00ffa3aa;
-      border-radius: 12px;
-      overflow: hidden;
-      transition: box-shadow 1s ease-in-out;
-    }
-    video {
-      border-radius: 12px;
-      width: 100%;
-      height: auto;
-    }
-    p.status {
-      font-size: clamp(0.8rem, 2vw, 1rem);
-      margin-top: 15px;
-      color: #66ffc9cc;
-      font-weight: 600;
-      padding: 0 10px;
-    }
-    .status.note {
-      font-size: clamp(0.75rem, 1.8vw, 1rem);
-      color: #ff9999;
-      font-style: italic;
-      margin-top: 5px;
-      padding: 0 10px;
-    }
-    footer {
-      margin: 15px 0;
-      font-size: clamp(0.7rem, 1.5vw, 0.8rem);
-      opacity: 1.0;
-      word-break: break-word;
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Talha's Stream</title>
+  <link rel="icon" href="https://s10.gifyu.com/images/SrMU9.png" />
+  <link rel="stylesheet" href="https://cdn.plyr.io/3.7.2/plyr.css" />
+  <style>
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: white;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+      user-select: none;
+      padding: 10px;
+      box-sizing: border-box;
+      text-align: center;
+    }
+    #main-title {
+      margin-top: 10px;
+      font-weight: 700;
+      font-size: clamp(1.5rem, 4vw, 2.5rem);
+      text-shadow: 0 0 15px #00ffa3;
+      color: #00ffa3;
+      word-wrap: break-word;
+    }
+    #file-name {
+      font-size: clamp(0.7rem, 2vw, 1rem);
+      font-weight: 550;
+      color: #a0f4c1;
+      margin-top: 4px;
+      user-select: text;
+      word-break: break-word;
+      max-width: 95%;
+    }
+    #player-container {
+      width: 100%;
+      max-width: 900px;
+      margin: 20px auto;
+      border-radius: 12px;
+      overflow: hidden;
+      transition: box-shadow 0.5s ease;
+      box-shadow: 0 0 30px #00ffa3aa;
+    }
+    video {
+      border-radius: 12px;
+      width: 100%;
+      height: auto;
+    }
+    p.status {
+      font-size: clamp(0.8rem, 2vw, 1rem);
+      margin-top: 15px;
+      color: #66ffc9cc;
+      font-weight: 600;
+      padding: 0 10px;
+    }
+    .status.note {
+      font-size: clamp(0.75rem, 1.8vw, 1rem);
+      color: #ff9999;
+      font-style: italic;
+      margin-top: 5px;
+      padding: 0 10px;
+    }
+    footer {
+      margin: 15px 0;
+      font-size: clamp(0.7rem, 1.5vw, 0.8rem);
+      opacity: 1.0;
+      word-break: break-word;
+    }
+  </style>
 </head>
 <body>
-  <h1 id="main-title">Talha's Stream</h1>
-  <p id="file-name">Loading file name...</p>
+  <h1 id="main-title">Talha's Stream</h1>
+  <p id="file-name">Loading file name...</p>
+  <div id="player-container">
+    <video id="player" controls playsinline webkit-playsinline preload="metadata" poster="https://s10.gifyu.com/images/SrMU9.png">
+      <source id="source" src="" type="video/mp4" />
+      Sorry, your browser doesn't support embedded videos. *Contact Site Owner : Talha*
+    </video>
+  </div>
+  <p class="status" id="status">Loading video...</p>
+  <p class="status note">
+    Note: If the video plays without sound, your browser likely does not support EAC3 / Audio encoder. Please download the video to listen with full audio support.
+  </p>
+  <footer>©2020–2025 Talha's Collection | Made By Talha</footer>
 
-  <div id="player-container">
-    <video id="player" controls playsinline webkit-playsinline preload="metadata" poster="https://s10.gifyu.com/images/SrMU9.png">
-      <source id="source" src="" type="video/mp4" />
-      Sorry, your browser doesn't support embedded videos. *Contact Site Owner : Talha*
-    </video>
-  </div>
-  <p class="status" id="status">Loading video...</p>
-  <p class="status note">
-    Note: If the video plays without sound, your browser likely does not support EAC3 / Audio encoder. Please download the video to listen with full audio support.
-  </p>
-  <footer>©2020–2025 Talha's Collection | Made By Talha</footer>
+  <script src="https://cdn.plyr.io/3.7.2/plyr.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
+  <script>
+    const keyString = "Talha<what!".padEnd(32);
+    const encoder = new TextEncoder();
+    const rawKey = encoder.encode(keyString);
 
-  <script src="https://cdn.plyr.io/3.7.2/plyr.js"></script>
-  <script src="https://unpkg.com/color-thief-browser/dist/color-thief.umd.js"></script>
-  <script>
-    const keyString = "Talha<what!".padEnd(32);
-    const encoder = new TextEncoder();
-    const rawKey = encoder.encode(keyString);
+    function getParam(name) {
+      const url = new URL(window.location.href);
+      return url.searchParams.get(name);
+    }
 
-    function getParam(name) {
-      const url = new URL(window.location.href);
-      return url.searchParams.get(name);
-    }
+    async function importKey() {
+      return await crypto.subtle.importKey('raw', rawKey.slice(0, 32), 'AES-GCM', false, ['decrypt']);
+    }
 
-    async function importKey() {
-      return await crypto.subtle.importKey(
-        'raw',
-        rawKey.slice(0, 32),
-        'AES-GCM',
-        false,
-        ['decrypt']
-      );
-    }
+    async function decryptPayload(data) {
+      try {
+        const binaryStr = atob(data);
+        const buffer = new Uint8Array(binaryStr.length);
+        for (let i = 0; i < binaryStr.length; i++) buffer[i] = binaryStr.charCodeAt(i);
+        const iv = buffer.slice(0, 12);
+        const encryptedData = buffer.slice(12);
+        const cryptoKey = await importKey();
+        const decryptedBuffer = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, cryptoKey, encryptedData);
+        return new TextDecoder().decode(decryptedBuffer);
+      } catch (e) {
+        throw new Error('Decryption failed or invalid data. *Contact Site Owner : Talha*');
+      }
+    }
 
-    async function decryptPayload(data) {
-      try {
-        const binaryStr = atob(data);
-        const buffer = new Uint8Array(binaryStr.length);
-        for (let i = 0; i < binaryStr.length; i++) buffer[i] = binaryStr.charCodeAt(i);
+    async function setupPlayer() {
+      const encryptedData = getParam('Talha');
+      const statusEl = document.getElementById('status');
+      if (!encryptedData) {
+        statusEl.textContent = 'No video data found in URL. *Contact Site Owner : Talha*';
+        return;
+      }
 
-        const iv = buffer.slice(0, 12);
-        const encryptedData = buffer.slice(12);
-        const cryptoKey = await importKey();
+      try {
+        const decryptedText = await decryptPayload(encryptedData);
+        const data = JSON.parse(decryptedText);
 
-        const decryptedBuffer = await crypto.subtle.decrypt(
-          { name: 'AES-GCM', iv },
-          cryptoKey,
-          encryptedData
-        );
+        statusEl.textContent = 'Video loaded successfully. Enjoy!';
+        const sourceEl = document.getElementById('source');
+        sourceEl.src = data.url;
 
-        return new TextDecoder().decode(decryptedBuffer);
-      } catch (e) {
-        throw new Error('Decryption failed or invalid data. *Contact Site Owner : Talha*');
-      }
-    }
+        document.getElementById('main-title').textContent = "Talha's Stream";
+        document.getElementById('file-name').textContent = data.name || 'Unknown File. *Contact Site Owner : Talha*';
 
-    async function setupPlayer() {
-      const encryptedData = getParam('Talha');
-      const statusEl = document.getElementById('status');
+        const player = new Plyr('#player', {
+          controls: [
+            'play-large', 'rewind', 'play', 'fast-forward',
+            'progress', 'current-time', 'mute', 'volume',
+            'settings', 'pip', 'fullscreen'
+          ],
+          settings: ['quality', 'speed', 'loop'],
+          keyboard: { focused: true, global: false },
+          seekTime: 10
+        });
 
-      if (!encryptedData) {
-        statusEl.textContent = 'No video data found in URL. *Contact Site Owner : Talha*';
-        return;
-      }
+        document.getElementById('player').load();
+        player.play();
 
-      try {
-        const decryptedText = await decryptPayload(encryptedData);
-        const data = JSON.parse(decryptedText);
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'ArrowRight') player.forward(10);
+          if (e.key === 'ArrowLeft') player.rewind(10);
+        });
 
-        statusEl.textContent = 'Video loaded successfully. Enjoy!';
+        optimizeVideoPerformance(document.getElementById('player'));
 
-        const sourceEl = document.getElementById('source');
-        sourceEl.src = data.url;
+        const videoEl = document.getElementById('player');
+        videoEl.addEventListener('loadedmetadata', () => {
+          const audioTracks = videoEl.audioTracks;
+          let audioMenu = {};
+          if (audioTracks && audioTracks.length > 0) {
+            for (let i = 0; i < audioTracks.length; i++) {
+              let label = audioTracks[i].label || audioTracks[i].language || `Track ${i+1}`;
+              audioMenu[i] = label;
+            }
+          } else {
+            audioMenu[0] = 'Default Audio Track';
+          }
 
-        const posterURL = data.poster || "https://s10.gifyu.com/images/SrMU9.png";
-        document.getElementById('player').setAttribute('poster', posterURL);
-        applyGlowFromThumbnail(posterURL);
+          player.config.settings.push('audio');
+          player.on('ready', () => {
+            player.settings.addSetting('audio', audioMenu, (selected) => {
+              if (audioTracks && audioTracks.length > 0) {
+                for (let i = 0; i < audioTracks.length; i++) {
+                  audioTracks[i].enabled = (i === parseInt(selected));
+                }
+              }
+              player.settings.hide();
+            });
+            if (audioTracks && audioTracks.length > 0) {
+              for (let i = 0; i < audioTracks.length; i++) {
+                audioTracks[i].enabled = (i === 0);
+              }
+            }
+          });
+        });
 
-        document.getElementById('main-title').textContent = "Talha's Stream";
-        document.getElementById('file-name').textContent = data.name || 'Unknown File. *Contact Site Owner : Talha*';
+        videoEl.addEventListener('contextmenu', e => e.preventDefault());
+        window.addEventListener('keydown', e => {
+          if (
+            e.key === 'F12' ||
+            (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
+            (e.ctrlKey && e.key === 'U')
+          ) {
+            e.preventDefault();
+            return false;
+          }
+        });
 
-        const player = new Plyr('#player', {
-          controls: [
-            'play-large',
-            'rewind',
-            'play',
-            'fast-forward',
-            'progress',
-            'current-time',
-            'mute',
-            'volume',
-            'settings',
-            'pip',
-            'fullscreen'
-          ],
-          settings: ['quality', 'speed', 'loop'],
-          keyboard: { focused: true, global: false },
-          seekTime: 10
-        });
+        // 👇 Add glow from thumbnail
+        applyGlowFromThumbnail(data.poster || "https://s10.gifyu.com/images/SrMU9.png");
 
-        document.getElementById('player').load();
-        player.play();
+      } catch (err) {
+        statusEl.textContent = 'Failed to load video: ' + err.message;
+      }
+    }
 
-        document.addEventListener('keydown', (e) => {
-          if (e.key === 'ArrowRight') player.forward(10);
-          if (e.key === 'ArrowLeft') player.rewind(10);
-        });
+    function optimizeVideoPerformance(videoElement) {
+      if (!videoElement) return;
+      videoElement.preload = "metadata";
+      videoElement.addEventListener("waiting", () => { videoElement.playbackRate = 0.9; });
+      videoElement.addEventListener("playing", () => { videoElement.playbackRate = 1.0; });
+      const source = videoElement.querySelector("source");
+      if (source && 'fetchPriority' in source) source.fetchPriority = "high";
+    }
 
-        optimizeVideoPerformance(document.getElementById('player'));
+    function lockOrientationOnFullscreen() {
+      const player = document.getElementById('player');
+      player.addEventListener('fullscreenchange', async () => {
+        if (document.fullscreenElement && screen.orientation && screen.orientation.lock) {
+          try { await screen.orientation.lock('landscape'); }
+          catch (e) { console.warn('Orientation lock not supported:', e); }
+        }
+      });
+    }
 
-        const videoEl = document.getElementById('player');
+    function applyGlowFromThumbnail(posterURL) {
+      const img = new Image();
+      img.crossOrigin = "Anonymous";
+      img.src = posterURL;
+      img.onload = function () {
+        const colorThief = new ColorThief();
+        const dominantColor = colorThief.getColor(img);
+        const glow = `0 0 30px rgba(${dominantColor[0]}, ${dominantColor[1]}, ${dominantColor[2]}, 0.7)`;
+        document.getElementById('player-container').style.boxShadow = glow;
+      };
+    }
 
-        videoEl.addEventListener('loadedmetadata', () => {
-          const audioTracks = videoEl.audioTracks;
-          let audioMenu = {};
-
-          if (audioTracks && audioTracks.length > 0) {
-            for (let i = 0; i < audioTracks.length; i++) {
-              let label = audioTracks[i].label || audioTracks[i].language || `Track ${i+1}`;
-              audioMenu[i] = label;
-            }
-          } else {
-            audioMenu[0] = 'Default Audio Track';
-          }
-
-          player.config.settings.push('audio');
-
-          player.on('ready', () => {
-            player.settings.addSetting('audio', audioMenu, (selected) => {
-              if (audioTracks && audioTracks.length > 0) {
-                for (let i = 0; i < audioTracks.length; i++) {
-                  audioTracks[i].enabled = (i === parseInt(selected));
-                }
-              }
-              player.settings.hide();
-            });
-
-            if (audioTracks && audioTracks.length > 0) {
-              for (let i = 0; i < audioTracks.length; i++) {
-                audioTracks[i].enabled = (i === 0);
-              }
-            }
-          });
-        });
-
-        videoEl.addEventListener('contextmenu', e => e.preventDefault());
-        window.addEventListener('keydown', e => {
-          if (
-            e.key === 'F12' ||
-            (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
-            (e.ctrlKey && e.key === 'U')
-          ) {
-            e.preventDefault();
-            return false;
-          }
-        });
-
-      } catch (err) {
-        statusEl.textContent = 'Failed to load video: ' + err.message;
-      }
-    }
-
-    function optimizeVideoPerformance(videoElement) {
-      if (!videoElement) return;
-      videoElement.preload = "metadata";
-      videoElement.addEventListener("waiting", () => { videoElement.playbackRate = 0.9; });
-      videoElement.addEventListener("playing", () => { videoElement.playbackRate = 1.0; });
-      const source = videoElement.querySelector("source");
-      if (source && 'fetchPriority' in source) source.fetchPriority = "high";
-    }
-
-    function lockOrientationOnFullscreen() {
-      const player = document.getElementById('player');
-      player.addEventListener('fullscreenchange', async () => {
-        if (document.fullscreenElement && screen.orientation && screen.orientation.lock) {
-          try { await screen.orientation.lock('landscape'); }
-          catch (e) { console.warn('Orientation lock not supported:', e); }
-        }
-      });
-    }
-
-    function applyGlowFromThumbnail(posterURL) {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.src = posterURL;
-
-      img.onload = () => {
-        const colorThief = new ColorThief();
-        const dominantColor = colorThief.getColor(img);
-        const glowColor = `rgb(${dominantColor[0]}, ${dominantColor[1]}, ${dominantColor[2]})`;
-
-        const container = document.getElementById('player-container');
-        container.style.boxShadow = `0 0 40px rgba(${dominantColor[0]}, ${dominantColor[1]}, ${dominantColor[2]}, 0.6)`;
-
-        const title = document.getElementById('main-title');
-        title.style.textShadow = `0 0 20px ${glowColor}`;
-        title.style.color = glowColor;
-      };
-    }
-
-    window.onload = setupPlayer;
-    lockOrientationOnFullscreen();
-  </script>
+    window.onload = setupPlayer;
+    lockOrientationOnFullscreen();
+  </script>
 </body>
 </html>
