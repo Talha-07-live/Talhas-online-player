@@ -9,7 +9,6 @@
   <style>
     body {
       margin: 0;
-      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
       color: white;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       display: flex;
@@ -22,6 +21,8 @@
       padding: 10px;
       box-sizing: border-box;
       text-align: center;
+      transition: background 1.2s ease-in-out;
+      background: radial-gradient(circle at center, #0f2027, #2c5364);
     }
     #main-title {
       margin-top: 10px;
@@ -85,11 +86,15 @@
       Sorry, your browser doesn't support embedded videos. *Contact Site Owner : Talha*
     </video>
   </div>
+
   <p class="status" id="status">Loading video...</p>
   <p class="status note">
     Note: If the video plays without sound, your browser likely does not support EAC3 / Audio encoder. Please download the video to listen with full audio support.
   </p>
   <footer>©2020–2025 Talha's Collection | Made By Talha</footer>
+
+  <!-- Hidden canvas for color extraction -->
+  <canvas id="hiddenCanvas" style="display: none;"></canvas>
 
   <script src="https://cdn.plyr.io/3.7.2/plyr.js"></script>
   <script>
@@ -157,19 +162,11 @@
 
         const player = new Plyr('#player', {
           controls: [
-            'play-large',
-            'rewind',
-            'play',
-            'fast-forward',
-            'progress',
-            'current-time',
-            'mute',
-            'volume',
-            'settings',
-            'pip',
-            'fullscreen'
+            'play-large', 'rewind', 'play', 'fast-forward',
+            'progress', 'current-time', 'mute', 'volume',
+            'settings', 'pip', 'fullscreen'
           ],
-          settings: ['quality', 'speed', 'loop'], // We will add custom audio setting manually
+          settings: ['quality', 'speed', 'loop'],
           keyboard: { focused: true, global: false },
           seekTime: 10
         });
@@ -183,47 +180,11 @@
         });
 
         optimizeVideoPerformance(document.getElementById('player'));
+        setupDynamicBackground(document.getElementById('player'));
 
+        // Disable right-click & inspect
         const videoEl = document.getElementById('player');
-
-        videoEl.addEventListener('loadedmetadata', () => {
-          const audioTracks = videoEl.audioTracks;
-          let audioMenu = {};
-
-          if (audioTracks && audioTracks.length > 0) {
-            for (let i = 0; i < audioTracks.length; i++) {
-              let label = audioTracks[i].label || audioTracks[i].language || `Track ${i+1}`;
-              audioMenu[i] = label;
-            }
-          } else {
-            audioMenu[0] = 'Default Audio Track';
-          }
-
-          // Custom audio track setting injection
-          player.config.settings.push('audio'); // Add audio to settings list
-
-          player.on('ready', () => {
-            player.settings.addSetting('audio', audioMenu, (selected) => {
-              if (audioTracks && audioTracks.length > 0) {
-                for (let i = 0; i < audioTracks.length; i++) {
-                  audioTracks[i].enabled = (i === parseInt(selected));
-                }
-              }
-              player.settings.hide();
-            });
-
-            // Set default audio track enabled
-            if (audioTracks && audioTracks.length > 0) {
-              for (let i = 0; i < audioTracks.length; i++) {
-                audioTracks[i].enabled = (i === 0);
-              }
-            }
-          });
-        });
-
-        // Disable right click
         videoEl.addEventListener('contextmenu', e => e.preventDefault());
-        // Disable Inspect shortcuts
         window.addEventListener('keydown', e => {
           if (
             e.key === 'F12' ||
@@ -247,6 +208,44 @@
       videoElement.addEventListener("playing", () => { videoElement.playbackRate = 1.0; });
       const source = videoElement.querySelector("source");
       if (source && 'fetchPriority' in source) source.fetchPriority = "high";
+    }
+
+    function setupDynamicBackground(video) {
+      const canvas = document.getElementById('hiddenCanvas');
+      const ctx = canvas.getContext('2d');
+
+      function getAverageColor() {
+        if (video.videoWidth === 0 || video.videoHeight === 0) return;
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        let length = frame.data.length;
+        let r = 0, g = 0, b = 0, count = 0;
+
+        for (let i = 0; i < length; i += 4) {
+          r += frame.data[i];
+          g += frame.data[i + 1];
+          b += frame.data[i + 2];
+          count++;
+        }
+
+        r = Math.floor(r / count);
+        g = Math.floor(g / count);
+        b = Math.floor(b / count);
+
+        return `rgb(${r}, ${g}, ${b})`;
+      }
+
+      setInterval(() => {
+        if (!video.paused && !video.ended) {
+          const color = getAverageColor();
+          if (color) {
+            document.body.style.background = `radial-gradient(circle at center, ${color}, #000000)`;
+          }
+        }
+      }, 2000);
     }
 
     function lockOrientationOnFullscreen() {
