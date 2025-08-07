@@ -1,233 +1,256 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Talha's Stream</title>
-  <link rel="icon" href="https://s10.gifyu.com/images/SrMU9.png" />
-  <link rel="stylesheet" href="https://cdn.plyr.io/3.7.2/plyr.css" />
-  <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
-  <style>
-    body {
-      margin: 0;
-      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-      color: white;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      overflow-x: hidden;
-      user-select: none;
-      padding: 10px;
-      box-sizing: border-box;
-      text-align: center;
-    }
-    #main-title {
-      margin-top: 10px;
-      font-weight: 700;
-      font-size: clamp(1.5rem, 4vw, 2.5rem);
-      text-shadow: 0 0 15px #00ffa3;
-      color: #00ffa3;
-      word-wrap: break-word;
-    }
-    #file-name {
-      font-size: clamp(0.7rem, 2vw, 1rem);
-      font-weight: 550;
-      color: #a0f4c1;
-      margin-top: 4px;
-      user-select: text;
-      word-break: break-word;
-      max-width: 95%;
-    }
-    #player-container {
-      width: 100%;
-      max-width: 900px;
-      margin: 20px auto;
-      border-radius: 12px;
-      overflow: hidden;
-      transition: box-shadow 0.5s ease;
-      box-shadow: 0 0 30px #00ffa3aa;
-    }
-    video {
-      border-radius: 12px;
-      width: 100%;
-      height: auto;
-    }
-    p.status {
-      font-size: clamp(0.8rem, 2vw, 1rem);
-      margin-top: 15px;
-      color: #66ffc9cc;
-      font-weight: 600;
-      padding: 0 10px;
-    }
-    .status.note {
-      font-size: clamp(0.75rem, 1.8vw, 1rem);
-      color: #ff9999;
-      font-style: italic;
-      margin-top: 5px;
-      padding: 0 10px;
-    }
-    footer {
-      margin: 15px 0;
-      font-size: clamp(0.7rem, 1.5vw, 0.8rem);
-      opacity: 1.0;
-      word-break: break-word;
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Talha's Stream</title>
+  <link rel="icon" href="https://s10.gifyu.com/images/SrMU9.png" />
+  <link rel="stylesheet" href="https://cdn.plyr.io/3.7.2/plyr.css" />
+  <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
+  <style>
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: white;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+      user-select: none;
+      padding: 10px;
+      box-sizing: border-box;
+      text-align: center;
+    }
+    #main-title {
+      margin-top: 10px;
+      font-weight: 700;
+      font-size: clamp(1.5rem, 4vw, 2.5rem);
+      text-shadow: 0 0 15px #00ffa3;
+      color: #00ffa3;
+      word-wrap: break-word;
+    }
+    #file-name {
+      font-size: clamp(0.7rem, 2vw, 1rem);
+      font-weight: 550;
+      color: #a0f4c1;
+      margin-top: 4px;
+      user-select: text;
+      word-break: break-word;
+      max-width: 95%;
+    }
+    #player-container {
+      position: relative;
+      width: 100%;
+      max-width: 900px;
+      margin: 20px auto;
+      border-radius: 12px;
+      overflow: hidden;
+      transition: box-shadow 0.5s ease;
+      box-shadow: 0 0 35px rgba(0, 255, 163, 0.4);
+    }
+    #player-container::before {
+      content: "";
+      position: absolute;
+      top: -15px;
+      left: -15px;
+      right: -15px;
+      bottom: -15px;
+      z-index: -1;
+      border-radius: 20px;
+      background: radial-gradient(circle, rgba(0,255,163,0.1) 0%, rgba(0,255,163,0) 70%);
+      filter: blur(20px);
+      pointer-events: none;
+    }
+    video {
+      border-radius: 12px;
+      width: 100%;
+      height: auto;
+    }
+    p.status {
+      font-size: clamp(0.8rem, 2vw, 1rem);
+      margin-top: 15px;
+      color: #66ffc9cc;
+      font-weight: 600;
+      padding: 0 10px;
+    }
+    .status.note {
+      font-size: clamp(0.75rem, 1.8vw, 1rem);
+      color: #ff9999;
+      font-style: italic;
+      margin-top: 5px;
+      padding: 0 10px;
+    }
+    footer {
+      margin: 15px 0;
+      font-size: clamp(0.7rem, 1.5vw, 0.8rem);
+      opacity: 1.0;
+      word-break: break-word;
+    }
+  </style>
 </head>
 <body>
-  <h1 id="main-title">Talha's Stream</h1>
-  <p id="file-name">Loading file name...</p>
-  <div id="player-container">
-    <video id="player" controls playsinline muted webkit-playsinline preload="auto" poster="https://s10.gifyu.com/images/SrMU9.png">
-      <source id="source" src="" type="video/mp4" />
-      Sorry, your browser doesn't support embedded videos. *Contact Site Owner : Talha*
-    </video>
-  </div>
-  <p class="status" id="status">Loading video...</p>
-  <p class="status note">
-    Note: If the video plays without sound, your browser likely does not support EAC3 / Audio encoder. Please download the video to listen with full audio support.
-  </p>
-  <footer>©2020–2025 Talha's Collection | Made By Talha</footer>
+  <h1 id="main-title">Talha's Stream</h1>
+  <p id="file-name">Loading file name...</p>
+  <div id="player-container">
+    <video id="player" controls playsinline muted webkit-playsinline preload="auto" poster="https://s10.gifyu.com/images/SrMU9.png">
+      <source id="source" src="" type="video/mp4" />
+      Sorry, your browser doesn't support embedded videos. *Contact Site Owner : Talha*
+    </video>
+  </div>
+  <p class="status" id="status">Loading video...</p>
+  <p class="status note">
+    Note: If the video plays without sound, your browser likely does not support EAC3 / Audio encoder. Please download the video to listen with full audio support.
+  </p>
+  <footer>©2020–2025 Talha's Collection | Made By Talha</footer>
 
-  <script>
-    const keyString = "Talha<what!".padEnd(32);
-    const encoder = new TextEncoder();
-    const rawKey = encoder.encode(keyString);
+  <script>
+    const keyString = "Talha<what!".padEnd(32);
+    const encoder = new TextEncoder();
+    const rawKey = encoder.encode(keyString);
 
-    function getParam(name) {
-      const url = new URL(window.location.href);
-      return url.searchParams.get(name);
-    }
+    function getParam(name) {
+      const url = new URL(window.location.href);
+      return url.searchParams.get(name);
+    }
 
-    async function importKey() {
-      return await crypto.subtle.importKey('raw', rawKey.slice(0, 32), 'AES-GCM', false, ['decrypt']);
-    }
+    async function importKey() {
+      return await crypto.subtle.importKey('raw', rawKey.slice(0, 32), 'AES-GCM', false, ['decrypt']);
+    }
 
-    async function decryptPayload(data) {
-      try {
-        const binaryStr = atob(data);
-        const buffer = new Uint8Array(binaryStr.length);
-        for (let i = 0; i < binaryStr.length; i++) buffer[i] = binaryStr.charCodeAt(i);
-        const iv = buffer.slice(0, 12);
-        const encryptedData = buffer.slice(12);
-        const cryptoKey = await importKey();
-        const decryptedBuffer = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, cryptoKey, encryptedData);
-        return new TextDecoder().decode(decryptedBuffer);
-      } catch (e) {
-        throw new Error('Decryption failed or invalid data. *Contact Site Owner : Talha*');
-      }
-    }
+    async function decryptPayload(data) {
+      try {
+        const binaryStr = atob(data);
+        const buffer = new Uint8Array(binaryStr.length);
+        for (let i = 0; i < binaryStr.length; i++) buffer[i] = binaryStr.charCodeAt(i);
+        const iv = buffer.slice(0, 12);
+        const encryptedData = buffer.slice(12);
+        const cryptoKey = await importKey();
+        const decryptedBuffer = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, cryptoKey, encryptedData);
+        return new TextDecoder().decode(decryptedBuffer);
+      } catch (e) {
+        throw new Error('Decryption failed or invalid data. *Contact Site Owner : Talha*');
+      }
+    }
 
-    async function setupPlayer() {
-      const encryptedData = getParam('Talha');
-      const statusEl = document.getElementById('status');
-      if (!encryptedData) {
-        statusEl.textContent = 'No video data found in URL. *Contact Site Owner : Talha*';
-        return;
-      }
+    async function setupPlayer() {
+      const encryptedData = getParam('Talha');
+      const statusEl = document.getElementById('status');
+      if (!encryptedData) {
+        statusEl.textContent = 'No video data found in URL. *Contact Site Owner : Talha*';
+        return;
+      }
 
-      try {
-        const decryptedText = await decryptPayload(encryptedData);
-        const data = JSON.parse(decryptedText);
+      try {
+        const decryptedText = await decryptPayload(encryptedData);
+        const data = JSON.parse(decryptedText);
 
-        statusEl.textContent = 'Video loaded successfully. Enjoy!';
-        const sourceEl = document.getElementById('source');
-        sourceEl.src = data.url;
+        statusEl.textContent = 'Video loaded successfully. Enjoy!';
+        const sourceEl = document.getElementById('source');
+        sourceEl.src = data.url;
 
-        document.getElementById('main-title').textContent = "Talha's Stream";
-        document.getElementById('file-name').textContent = data.name || 'Unknown File. *Contact Site Owner : Talha*';
+        document.getElementById('main-title').textContent = "Talha's Stream";
+        document.getElementById('file-name').textContent = data.name || 'Unknown File. *Contact Site Owner : Talha*';
 
-        const player = new Plyr('#player', {
-          controls: [
-            'play-large', 'rewind', 'play', 'fast-forward',
-            'progress', 'current-time', 'mute', 'volume',
-            'settings', 'pip', 'fullscreen'
-          ],
-          settings: ['quality', 'speed', 'loop'],
-          keyboard: { focused: true, global: false },
-          seekTime: 10
-        });
+        const player = new Plyr('#player', {
+          controls: [
+            'play-large', 'rewind', 'play', 'fast-forward',
+            'progress', 'current-time', 'mute', 'volume',
+            'settings', 'pip', 'fullscreen'
+          ],
+          settings: ['quality', 'speed', 'loop'],
+          keyboard: { focused: true, global: false },
+          seekTime: 10
+        });
 
-        document.getElementById('player').load();
-        player.play();
+        const videoEl = document.getElementById('player');
+        optimizeVideoPerformance(videoEl);
+        videoEl.load();
+        player.play();
 
-        // Fixed seeking artifact issue
-        document.addEventListener('keydown', (e) => {
-          if (e.key === 'ArrowRight') {
-            player.forward(10);
-            document.getElementById('player').currentTime += 0.001;
-          }
-          if (e.key === 'ArrowLeft') {
-            player.rewind(10);
-            document.getElementById('player').currentTime += 0.001;
-          }
-        });
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'ArrowRight') {
+            player.forward(10);
+            videoEl.currentTime += 0.001;
+          }
+          if (e.key === 'ArrowLeft') {
+            player.rewind(10);
+            videoEl.currentTime += 0.001;
+          }
+        });
 
-        optimizeVideoPerformance(document.getElementById('player'));
+        videoEl.addEventListener("waiting", () => {
+          statusEl.textContent = "Buffering... Please wait.";
+        });
+        videoEl.addEventListener("playing. Enjoy!", () => {
+          statusEl.textContent = "Playing. Enjoy!";
+        });
 
-        const videoEl = document.getElementById('player');
-        videoEl.addEventListener("waiting", () => {
-          document.getElementById('status').textContent = "Buffering... Please wait.";
-        });
-        videoEl.addEventListener("playing", () => {
-          document.getElementById('status').textContent = "Playing";
-        });
+        videoEl.addEventListener('contextmenu', e => e.preventDefault());
+        window.addEventListener('keydown', e => {
+          if (
+            e.key === 'F12' ||
+            (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
+            (e.ctrlKey && e.key === 'U')
+          ) {
+            e.preventDefault();
+            return false;
+          }
+        });
 
-        // Context menu block & dev tool protection
-        videoEl.addEventListener('contextmenu', e => e.preventDefault());
-        window.addEventListener('keydown', e => {
-          if (
-            e.key === 'F12' ||
-            (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
-            (e.ctrlKey && e.key === 'U')
-          ) {
-            e.preventDefault();
-            return false;
-          }
-        });
+        applyGlowFromThumbnail(data.poster || "https://s10.gifyu.com/images/SrMU9.png");
 
-        applyGlowFromThumbnail(data.poster || "https://s10.gifyu.com/images/SrMU9.png");
+      } catch (err) {
+        statusEl.textContent = 'Failed to load video: ' + err.message;
+      }
+    }
 
-      } catch (err) {
-        statusEl.textContent = 'Failed to load video: ' + err.message;
-      }
-    }
+    function optimizeVideoPerformance(videoElement) {
+      if (!videoElement) return;
+      videoElement.preload = "auto";
+      videoElement.setAttribute("playsinline", "true");
+      videoElement.setAttribute("webkit-playsinline", "true");
+      videoElement.setAttribute("crossorigin", "anonymous");
+      videoElement.disableRemotePlayback = true;
 
-    function optimizeVideoPerformance(videoElement) {
-      if (!videoElement) return;
-      videoElement.preload = "auto";
-      const source = videoElement.querySelector("source");
-      if (source && 'fetchPriority' in source) source.fetchPriority = "high";
-    }
+      const source = videoElement.querySelector("source");
+      if (source && 'fetchPriority' in source) source.fetchPriority = "high";
 
-    function lockOrientationOnFullscreen() {
-      const player = document.getElementById('player');
-      player.addEventListener('fullscreenchange', async () => {
-        if (document.fullscreenElement && screen.orientation && screen.orientation.lock) {
-          try { await screen.orientation.lock('landscape'); }
-          catch (e) { console.warn('Orientation lock not supported:', e); }
-        }
-      });
-    }
+      videoElement.addEventListener("seeking", () => {
+        videoElement.pause();
+      });
+      videoElement.addEventListener("seeked", () => {
+        setTimeout(() => videoElement.play(), 100);
+      });
+    }
 
-    function applyGlowFromThumbnail(posterURL) {
-      const img = new Image();
-      img.crossOrigin = "Anonymous";
-      img.src = posterURL;
-      img.onload = function () {
-        const colorThief = new ColorThief();
-        const dominantColor = colorThief.getColor(img);
-        const glow = `0 0 30px rgba(${dominantColor[0]}, ${dominantColor[1]}, ${dominantColor[2]}, 0.7)`;
-        document.getElementById('player-container').style.boxShadow = glow;
-      };
-    }
+    function lockOrientationOnFullscreen() {
+      const player = document.getElementById('player');
+      player.addEventListener('fullscreenchange', async () => {
+        if (document.fullscreenElement && screen.orientation && screen.orientation.lock) {
+          try { await screen.orientation.lock('landscape'); }
+          catch (e) { console.warn('Orientation lock not supported:', e); }
+        }
+      });
+    }
 
-    window.onload = setupPlayer;
-    lockOrientationOnFullscreen();
-  </script>
+    function applyGlowFromThumbnail(posterURL) {
+      const img = new Image();
+      img.crossOrigin = "Anonymous";
+      img.src = posterURL;
+      img.onload = function () {
+        const colorThief = new ColorThief();
+        const dominantColor = colorThief.getColor(img);
+        const glow = `0 0 30px rgba(${dominantColor[0]}, ${dominantColor[1]}, ${dominantColor[2]}, 0.7)`;
+        document.getElementById('player-container').style.boxShadow = glow;
+      };
+    }
+
+    window.onload = setupPlayer;
+    lockOrientationOnFullscreen();
+  </script>
 </body>
 </html>
