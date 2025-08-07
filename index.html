@@ -7,7 +7,6 @@
   <link rel="icon" href="https://s10.gifyu.com/images/SrMU9.png" />
   <link rel="stylesheet" href="https://cdn.plyr.io/3.7.2/plyr.css" />
   <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
   <style>
     body {
       margin: 0;
@@ -48,8 +47,8 @@
       margin: 20px auto;
       border-radius: 12px;
       overflow: hidden;
+      box-shadow: 0 0 40px rgba(0, 255, 163, 0.4); /* Hand-made soft glow */
       transition: box-shadow 0.5s ease;
-      box-shadow: 0 0 30px #00ffa3aa;
     }
     video {
       border-radius: 12px;
@@ -155,19 +154,16 @@
         document.getElementById('player').load();
         player.play();
 
-        // Fixed seeking artifact issue
         document.addEventListener('keydown', (e) => {
           if (e.key === 'ArrowRight') {
             player.forward(10);
-            document.getElementById('player').currentTime += 0.000;
+            document.getElementById('player').currentTime += 0.001;
           }
           if (e.key === 'ArrowLeft') {
             player.rewind(10);
-            document.getElementById('player').currentTime += 0.000;
+            document.getElementById('player').currentTime += 0.001;
           }
         });
-
-        optimizeVideoPerformance(document.getElementById('player'));
 
         const videoEl = document.getElementById('player');
         videoEl.addEventListener("waiting", () => {
@@ -177,7 +173,6 @@
           document.getElementById('status').textContent = "Playing. Enjoy!";
         });
 
-        // Context menu block & dev tool protection
         videoEl.addEventListener('contextmenu', e => e.preventDefault());
         window.addEventListener('keydown', e => {
           if (
@@ -190,18 +185,9 @@
           }
         });
 
-        applyGlowFromThumbnail(data.poster || "https://s10.gifyu.com/images/SrMU9.png");
-
       } catch (err) {
         statusEl.textContent = 'Failed to load video: ' + err.message;
       }
-    }
-
-    function optimizeVideoPerformance(videoElement) {
-      if (!videoElement) return;
-      videoElement.preload = "auto";
-      const source = videoElement.querySelector("source");
-      if (source && 'fetchPriority' in source) source.fetchPriority = "high";
     }
 
     function lockOrientationOnFullscreen() {
@@ -212,18 +198,6 @@
           catch (e) { console.warn('Orientation lock not supported:', e); }
         }
       });
-    }
-
-    function applyGlowFromThumbnail(posterURL) {
-      const img = new Image();
-      img.crossOrigin = "Anonymous";
-      img.src = posterURL;
-      img.onload = function () {
-        const colorThief = new ColorThief();
-        const dominantColor = colorThief.getColor(img);
-        const glow = `0 0 30px rgba(${dominantColor[0]}, ${dominantColor[1]}, ${dominantColor[2]}, 0.7)`;
-        document.getElementById('player-container').style.boxShadow = glow;
-      };
     }
 
     window.onload = setupPlayer;
