@@ -43,14 +43,14 @@
       max-width: 95%;
     }
     #player-container {
-      position: relative;
       width: 100%;
       max-width: 900px;
       margin: 20px auto;
       border-radius: 12px;
       overflow: hidden;
       transition: box-shadow 0.5s ease;
-      box-shadow: 0 0 35px rgba(0, 255, 163, 0.4);
+      box-shadow: 0 0 35px rgba(0, 255, 163, 0.35);
+      position: relative;
     }
     #player-container::before {
       content: "";
@@ -185,7 +185,7 @@
         videoEl.addEventListener("waiting", () => {
           statusEl.textContent = "Buffering... Please wait.";
         });
-        videoEl.addEventListener("playing. Enjoy!", () => {
+        videoEl.addEventListener("playing", () => {
           statusEl.textContent = "Playing. Enjoy!";
         });
 
@@ -211,14 +211,10 @@
     function optimizeVideoPerformance(videoElement) {
       if (!videoElement) return;
       videoElement.preload = "auto";
-      videoElement.setAttribute("playsinline", "true");
-      videoElement.setAttribute("webkit-playsinline", "true");
-      videoElement.setAttribute("crossorigin", "anonymous");
-      videoElement.disableRemotePlayback = true;
-
       const source = videoElement.querySelector("source");
       if (source && 'fetchPriority' in source) source.fetchPriority = "high";
 
+      // Pixelation fix: seeking এ pause, seeked এ play করানো
       videoElement.addEventListener("seeking", () => {
         videoElement.pause();
       });
