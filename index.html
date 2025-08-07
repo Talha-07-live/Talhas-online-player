@@ -82,7 +82,7 @@
   <h1 id="main-title">Talha's Stream</h1>
   <p id="file-name">Loading file name...</p>
   <div id="player-container">
-    <video id="player" controls playsinline webkit-playsinline preload="metadata" poster="https://s10.gifyu.com/images/SrMU9.png">
+    <video id="player" controls playsinline muted webkit-playsinline preload="auto" poster="https://s10.gifyu.com/images/SrMU9.png">
       <source id="source" src="" type="video/mp4" />
       Sorry, your browser doesn't support embedded videos. *Contact Site Owner : Talha*
     </video>
@@ -93,8 +93,6 @@
   </p>
   <footer>©2020–2025 Talha's Collection | Made By Talha</footer>
 
-  <script src="https://cdn.plyr.io/3.7.2/plyr.js"></script>
-  
   <script>
     const keyString = "Talha<what!".padEnd(32);
     const encoder = new TextEncoder();
@@ -157,44 +155,29 @@
         document.getElementById('player').load();
         player.play();
 
+        // Fixed seeking artifact issue
         document.addEventListener('keydown', (e) => {
-          if (e.key === 'ArrowRight') player.forward(10);
-          if (e.key === 'ArrowLeft') player.rewind(10);
+          if (e.key === 'ArrowRight') {
+            player.forward(10);
+            document.getElementById('player').currentTime += 0.001;
+          }
+          if (e.key === 'ArrowLeft') {
+            player.rewind(10);
+            document.getElementById('player').currentTime += 0.001;
+          }
         });
 
         optimizeVideoPerformance(document.getElementById('player'));
 
         const videoEl = document.getElementById('player');
-        videoEl.addEventListener('loadedmetadata', () => {
-          const audioTracks = videoEl.audioTracks;
-          let audioMenu = {};
-          if (audioTracks && audioTracks.length > 0) {
-            for (let i = 0; i < audioTracks.length; i++) {
-              let label = audioTracks[i].label || audioTracks[i].language || `Track ${i+1}`;
-              audioMenu[i] = label;
-            }
-          } else {
-            audioMenu[0] = 'Default Audio Track';
-          }
-
-          player.config.settings.push('audio');
-          player.on('ready', () => {
-            player.settings.addSetting('audio', audioMenu, (selected) => {
-              if (audioTracks && audioTracks.length > 0) {
-                for (let i = 0; i < audioTracks.length; i++) {
-                  audioTracks[i].enabled = (i === parseInt(selected));
-                }
-              }
-              player.settings.hide();
-            });
-            if (audioTracks && audioTracks.length > 0) {
-              for (let i = 0; i < audioTracks.length; i++) {
-                audioTracks[i].enabled = (i === 0);
-              }
-            }
-          });
+        videoEl.addEventListener("waiting", () => {
+          document.getElementById('status').textContent = "Buffering... Please wait.";
+        });
+        videoEl.addEventListener("playing", () => {
+          document.getElementById('status').textContent = "Playing";
         });
 
+        // Context menu block & dev tool protection
         videoEl.addEventListener('contextmenu', e => e.preventDefault());
         window.addEventListener('keydown', e => {
           if (
@@ -207,7 +190,6 @@
           }
         });
 
-        // 👇 Add glow from thumbnail
         applyGlowFromThumbnail(data.poster || "https://s10.gifyu.com/images/SrMU9.png");
 
       } catch (err) {
@@ -217,9 +199,7 @@
 
     function optimizeVideoPerformance(videoElement) {
       if (!videoElement) return;
-      videoElement.preload = "metadata";
-      videoElement.addEventListener("waiting", () => { videoElement.playbackRate = 0.9; });
-      videoElement.addEventListener("playing", () => { videoElement.playbackRate = 1.0; });
+      videoElement.preload = "auto";
       const source = videoElement.querySelector("source");
       if (source && 'fetchPriority' in source) source.fetchPriority = "high";
     }
