@@ -30,6 +30,7 @@
       text-shadow: 0 0 15px #00ffa3;
       color: #00ffa3;
       word-wrap: break-word;
+      transition: text-shadow 1s ease-in-out, color 1s ease-in-out;
     }
     #file-name {
       font-size: clamp(0.7rem, 2vw, 1rem);
@@ -44,13 +45,10 @@
       width: 100%;
       max-width: 900px;
       margin: 20px auto;
+      box-shadow: 0 0 30px #00ffa3aa;
       border-radius: 12px;
       overflow: hidden;
-      /* ডিফল্ট হালকা শেডো */
-      box-shadow:
-        0 0 15px 3px rgba(0, 255, 163, 0.3),
-        0 0 40px 15px rgba(0, 255, 163, 0.15);
-      transition: box-shadow 0.8s ease-in-out;
+      transition: box-shadow 1s ease-in-out;
     }
     video {
       border-radius: 12px;
@@ -84,7 +82,7 @@
   <p id="file-name">Loading file name...</p>
 
   <div id="player-container">
-    <video id="player" controls playsinline webkit-playsinline preload="metadata" poster="https://s10.gifyu.com/images/SrMU9.png" muted autoplay>
+    <video id="player" controls playsinline webkit-playsinline preload="metadata" poster="https://s10.gifyu.com/images/SrMU9.png">
       <source id="source" src="" type="video/mp4" />
       Sorry, your browser doesn't support embedded videos. *Contact Site Owner : Talha*
     </video>
@@ -96,6 +94,7 @@
   <footer>©2020–2025 Talha's Collection | Made By Talha</footer>
 
   <script src="https://cdn.plyr.io/3.7.2/plyr.js"></script>
+  <script src="https://unpkg.com/color-thief-browser/dist/color-thief.umd.js"></script>
   <script>
     const keyString = "Talha<what!".padEnd(32);
     const encoder = new TextEncoder();
@@ -138,48 +137,9 @@
       }
     }
 
-    function extractColorFromImage(imgUrl, callback) {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.src = imgUrl;
-
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-
-        canvas.width = img.width;
-        canvas.height = img.height;
-        ctx.drawImage(img, 0, 0);
-
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        let r=0, g=0, b=0, count=0;
-
-        for (let i = 0; i < imageData.data.length; i += 4) {
-          r += imageData.data[i];
-          g += imageData.data[i + 1];
-          b += imageData.data[i + 2];
-          count++;
-        }
-
-        r = Math.floor(r/count);
-        g = Math.floor(g/count);
-        b = Math.floor(b/count);
-
-        const color = `rgb(${r},${g},${b})`;
-        callback(color);
-      };
-
-      img.onerror = () => {
-        console.warn('Thumbnail image load failed, using default color.');
-        callback('rgba(0, 255, 163, 0.6)');
-      };
-    }
-
     async function setupPlayer() {
       const encryptedData = getParam('Talha');
       const statusEl = document.getElementById('status');
-      const videoEl = document.getElementById('player');
-      const playerContainer = document.getElementById('player-container');
 
       if (!encryptedData) {
         statusEl.textContent = 'No video data found in URL. *Contact Site Owner : Talha*';
@@ -195,21 +155,12 @@
         const sourceEl = document.getElementById('source');
         sourceEl.src = data.url;
 
+        const posterURL = data.poster || "https://s10.gifyu.com/images/SrMU9.png";
+        document.getElementById('player').setAttribute('poster', posterURL);
+        applyGlowFromThumbnail(posterURL);
+
         document.getElementById('main-title').textContent = "Talha's Stream";
         document.getElementById('file-name').textContent = data.name || 'Unknown File. *Contact Site Owner : Talha*';
-
-        videoEl.load();
-
-        // থাম্বনেইল URL নিন (data.poster না থাকলে video poster)
-        const posterUrl = data.poster || videoEl.getAttribute('poster');
-
-        extractColorFromImage(posterUrl, (color) => {
-          playerContainer.style.boxShadow = `
-            0 0 20px 5px ${color},
-            0 0 40px 15px ${color},
-            0 0 60px 30px ${color}
-          `;
-        });
 
         const player = new Plyr('#player', {
           controls: [
@@ -230,9 +181,52 @@
           seekTime: 10
         });
 
-        // Disable right click
+        document.getElementById('player').load();
+        player.play();
+
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'ArrowRight') player.forward(10);
+          if (e.key === 'ArrowLeft') player.rewind(10);
+        });
+
+        optimizeVideoPerformance(document.getElementById('player'));
+
+        const videoEl = document.getElementById('player');
+
+        videoEl.addEventListener('loadedmetadata', () => {
+          const audioTracks = videoEl.audioTracks;
+          let audioMenu = {};
+
+          if (audioTracks && audioTracks.length > 0) {
+            for (let i = 0; i < audioTracks.length; i++) {
+              let label = audioTracks[i].label || audioTracks[i].language || `Track ${i+1}`;
+              audioMenu[i] = label;
+            }
+          } else {
+            audioMenu[0] = 'Default Audio Track';
+          }
+
+          player.config.settings.push('audio');
+
+          player.on('ready', () => {
+            player.settings.addSetting('audio', audioMenu, (selected) => {
+              if (audioTracks && audioTracks.length > 0) {
+                for (let i = 0; i < audioTracks.length; i++) {
+                  audioTracks[i].enabled = (i === parseInt(selected));
+                }
+              }
+              player.settings.hide();
+            });
+
+            if (audioTracks && audioTracks.length > 0) {
+              for (let i = 0; i < audioTracks.length; i++) {
+                audioTracks[i].enabled = (i === 0);
+              }
+            }
+          });
+        });
+
         videoEl.addEventListener('contextmenu', e => e.preventDefault());
-        // Disable Inspect shortcuts
         window.addEventListener('keydown', e => {
           if (
             e.key === 'F12' ||
@@ -249,7 +243,46 @@
       }
     }
 
+    function optimizeVideoPerformance(videoElement) {
+      if (!videoElement) return;
+      videoElement.preload = "metadata";
+      videoElement.addEventListener("waiting", () => { videoElement.playbackRate = 0.9; });
+      videoElement.addEventListener("playing", () => { videoElement.playbackRate = 1.0; });
+      const source = videoElement.querySelector("source");
+      if (source && 'fetchPriority' in source) source.fetchPriority = "high";
+    }
+
+    function lockOrientationOnFullscreen() {
+      const player = document.getElementById('player');
+      player.addEventListener('fullscreenchange', async () => {
+        if (document.fullscreenElement && screen.orientation && screen.orientation.lock) {
+          try { await screen.orientation.lock('landscape'); }
+          catch (e) { console.warn('Orientation lock not supported:', e); }
+        }
+      });
+    }
+
+    function applyGlowFromThumbnail(posterURL) {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.src = posterURL;
+
+      img.onload = () => {
+        const colorThief = new ColorThief();
+        const dominantColor = colorThief.getColor(img);
+        const glowColor = `rgb(${dominantColor[0]}, ${dominantColor[1]}, ${dominantColor[2]})`;
+
+        const container = document.getElementById('player-container');
+        container.style.boxShadow = `0 0 40px rgba(${dominantColor[0]}, ${dominantColor[1]}, ${dominantColor[2]}, 0.6)`;
+
+        const title = document.getElementById('main-title');
+        title.style.textShadow = `0 0 20px ${glowColor}`;
+        title.style.color = glowColor;
+      };
+    }
+
     window.onload = setupPlayer;
+    lockOrientationOnFullscreen();
   </script>
 </body>
 </html>
