@@ -82,7 +82,7 @@
   <div id="player-container">
     <video id="player" controls playsinline webkit-playsinline preload="metadata" poster="https://s10.gifyu.com/images/SrMU9.png">
       <source id="source" src="" type="video/mp4" />
-      Sorry, your browser doesn't support embedded videos. *Contact Site Owner "Talha"*
+      Sorry, your browser doesn't support embedded videos. *Contact Site Owner : Talha*
     </video>
   </div>
   <p class="status" id="status">Loading video...</p>
@@ -130,7 +130,7 @@
 
         return new TextDecoder().decode(decryptedBuffer);
       } catch (e) {
-        throw new Error('Decryption failed or invalid data. *Contact My Owner "Talha"*');
+        throw new Error('Decryption failed or invalid data. *Contact Site Owner : Talha*');
       }
     }
 
@@ -139,7 +139,7 @@
       const statusEl = document.getElementById('status');
 
       if (!encryptedData) {
-        statusEl.textContent = 'No video data found in URL. *Contact My Owner "Talha"*';
+        statusEl.textContent = 'No video data found in URL. *Contact Site Owner : Talha*';
         return;
       }
 
@@ -153,7 +153,7 @@
         sourceEl.src = data.url;
 
         document.getElementById('main-title').textContent = "Talha's Stream";
-        document.getElementById('file-name').textContent = data.name || 'Unknown File. *Contact Site Owner "Talha"*';
+        document.getElementById('file-name').textContent = data.name || 'Unknown File. *Contact Site Owner : Talha*';
 
         const player = new Plyr('#player', {
           controls: [
@@ -236,7 +236,7 @@
         });
 
       } catch (err) {
-        statusEl.textContent = '*Contact Site Owner "Talha"* Failed to load video: ' + err.message;
+        statusEl.textContent = 'Failed to load video: ' + err.message;
       }
     }
 
