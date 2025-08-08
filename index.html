@@ -122,51 +122,61 @@
   </p>
 
   <div class="mt-6 bg-gray-900 p-4 rounded-lg shadow text-sm text-left break-words leading-relaxed text-center">
-      <p class="mt-6 text-center text-sm flex justify-center items-center gap-2">
-        <!-- Animated Clapperboard SVG -->
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="24" height="24" fill="none" stroke-linejoin="round" stroke-linecap="round" style="filter: drop-shadow(0 2px 2px rgba(0,0,0,0.25));">
-          <defs>
+            <p class="mt-6 text-center text-sm flex justify-center items-center gap-2">
+            <!-- Animated Clapperboard SVG -->
+            <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 64 64"
+            width="24"
+            height="24"
+            fill="none"
+            stroke-linejoin="round"
+            stroke-linecap="round"
+            style="filter: drop-shadow(0 2px 2px rgba(0,0,0,0.25));"
+            >
+            <defs>
             <linearGradient id="gradTop" x1="0" y1="10" x2="64" y2="24" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stop-color="#4f46e5" />
-              <stop offset="30%" stop-color="#818cf8" />
-              <stop offset="40%" stop-color="#fbbf24" stop-opacity="0.7">
-                <animate attributeName="offset" values="0;1" dur="2.5s" repeatCount="indefinite"/>
-              </stop>
-              <stop offset="60%" stop-color="#818cf8" />
-              <stop offset="100%" stop-color="#4f46e5" />
+            <stop offset="0%" stop-color="#4f46e5" />
+            <stop offset="30%" stop-color="#818cf8" />
+            <stop offset="40%" stop-color="#fbbf24" stop-opacity="0.7">
+            <animate attributeName="offset" values="0;1" dur="2.5s" repeatCount="indefinite"/>
+            </stop>
+            <stop offset="60%" stop-color="#818cf8" />
+            <stop offset="100%" stop-color="#4f46e5" />
             </linearGradient>
             <filter id="glow" x="-60%" y="-60%" width="220%" height="220%" color-interpolation-filters="sRGB">
-              <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#fbbf24" flood-opacity="0.9" />
-              <feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="#fbbf24" flood-opacity="0.6" />
+            <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#fbbf24" flood-opacity="0.9" />
+            <feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="#fbbf24" flood-opacity="0.6" />
             </filter>
-          </defs>
+            </defs>
 
-          <rect x="6" y="24" width="52" height="34" fill="#111" stroke="#333" stroke-width="1.5" rx="5" ry="5">
+            <rect x="6" y="24" width="52" height="34" fill="#111" stroke="#333" stroke-width="1.5" rx="5" ry="5">
             <animate attributeName="fill-opacity" values="1;0.85;1" dur="3s" repeatCount="indefinite" />
-          </rect>
+            </rect>
 
-          <g id="topGroup" transform-origin="32 24" style="transform-box: fill-box;">
+            <g id="topGroup" transform-origin="32 24" style="transform-box: fill-box;">
             <rect x="6" y="10" width="52" height="14" fill="url(#gradTop)" stroke="#3b82f6" stroke-width="1.7" rx="4" ry="4" />
             <path stroke="#c7d2fe" stroke-width="1.2" d="M6 10l52 14" />
             <path stroke="#e0e7ff" stroke-width="1" d="M12 10l6 14M24 10l6 14M36 10l6 14M48 10l6 14" />
-          </g>
+            </g>
 
-          <g id="playGroup" style="transform-origin: 34px 38px; transform-box: fill-box;">
+            <g id="playGroup" style="transform-origin: 34px 38px; transform-box: fill-box;">
             <polygon points="26,32 42,38 26,44" fill="#fbbf24" filter="url(#glow)" />
             <animateTransform attributeName="transform" attributeType="XML" type="scale" values="1;1.15;1" dur="2.6s" repeatCount="indefinite" additive="sum" />
             <animateTransform attributeName="transform" attributeType="XML" type="translate" values="0 0; 0 -4; 0 0" dur="2.6s" repeatCount="indefinite" additive="sum" />
-          </g>
+            </g>
 
-          <animateTransform xlink:href="#topGroup" attributeName="transform" attributeType="XML" type="rotate" values="0 32 24; -45 32 24; 15 32 24; 0 32 24" keyTimes="0; 0.4; 0.7; 1" dur="3.2s" repeatCount="indefinite" calcMode="spline" keySplines=".42 0 .58 1; .25 .46 .45 .94; .42 0 .58 1" />
-          <animateTransform attributeName="transform" attributeType="XML" type="rotate" values="1 32 32; -1 32 32; 1 32 32" dur="8s" repeatCount="indefinite" additive="sum" />
-        </svg>
+            <animateTransform xlink:href="#topGroup" attributeName="transform" attributeType="XML" type="rotate" values="0 32 24; -45 32 24; 15 32 24; 0 32 24" keyTimes="0; 0.4; 0.7; 1" dur="3.2s" repeatCount="indefinite" calcMode="spline" keySplines=".42 0 .58 1; .25 .46 .45 .94; .42 0 .58 1" />
 
-        <a href="https://group.talhascollectionjointrequest.xo.je/" target="_blank" class="text-blue-400 hover:text-blue-300 underline animate-pulse">
-          Join Movies Group
-        </a>
-      </p>
+            <animateTransform attributeName="transform" attributeType="XML" type="rotate" values="1 32 32; -1 32 32; 1 32 32" dur="8s" repeatCount="indefinite" additive="sum" />
+            </svg>
+
+            <a href="https://group.talhascollectionjointrequest.xo.je/" target="_blank" class="text-blue-400 hover:text-blue-300 underline animate-pulse">
+            Join Movies Group
+            </a>
+            </p>
     <footer>©2020–2025 Talha's Collection | Made By Talha</footer>
-    </div>
+  </div>
 
   <script>
     const keyString = "Talha<what!".padEnd(32);
