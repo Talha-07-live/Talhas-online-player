@@ -285,6 +285,19 @@
       }
     }
 
+    function checkAllowed(request) {
+  const origin = request.headers.get("Origin") || "";
+  const referer = request.headers.get("Referer") || "";
+
+  if (origin && !ALLOWED_DOMAINS.some(domain => origin.startsWith(domain))) {
+    return false;
+  }
+  if (referer && !ALLOWED_DOMAINS.some(domain => referer.startsWith(domain))) {
+    return false;
+  }
+  return true;
+}
+
     function lockOrientationOnFullscreen() {
       document.getElementById('player').addEventListener('enterpictureinpicture', async () => {
         try {
