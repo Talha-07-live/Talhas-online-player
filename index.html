@@ -178,16 +178,23 @@
 
   <script>
     const ALLOWED_DOMAINS = [
-      "https://talhas.collection.page.gd",
-      "https://talhasdownloader.talha07.workers.dev"
-    ];
-    
-    const ref = document.referrer || '';
-    if (!ALLOWED_DOMAINS.some(d => ref.startsWith(d))) {
-      document.body.innerHTML = "<h2 style='color:red;text-align:center;margin-top:40px;'>❌ Access Denied! Only allowed from " + ALLOWED_DOMAINS.join(", ") + "</h2>";
-      throw new Error("Blocked: Invalid referrer");
-    }
+  "https://talhas.collection.page.gd/",
+  "https://talhas.downloaderr.rf.gd/"
+];
 
+function checkAllowed(request) {
+  const origin = request.headers.get("Origin") || "";
+  const referer = request.headers.get("Referer") || "";
+
+  if (origin && !ALLOWED_DOMAINS.some(domain => origin.startsWith(domain))) {
+    return false;
+  }
+  if (referer && !ALLOWED_DOMAINS.some(domain => referer.startsWith(domain))) {
+    return false;
+  }
+  return true;
+}
+    
     const keyString = "Talha<what!".padEnd(32);
     const encoder = new TextEncoder();
     const rawKey = encoder.encode(keyString);
@@ -214,6 +221,13 @@
       } catch (e) {
         throw new Error('Decryption failed or invalid data. *Contact Site Owner : Talha*');
       }
+    }
+
+    export default {
+  async fetch(request) {
+    
+    if (!checkAllowed(request)) {
+      return new Response("Nah Bhai Hobe na ❌ Only allowed from https://talhas.collection.page.gd");
     }
 
     async function setupPlayer() {
