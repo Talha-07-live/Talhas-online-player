@@ -182,7 +182,7 @@
       "https://talhasdownloader.talha07.workers.dev/"];
     
     if (!document.referrer.startsWith(ALLOWED_DOMAIN)) {
-      document.body.innerHTML = "<h2 style='color:red;text-align:center;margin-top:40px;'>❌ Access Denied! Only allowed from " + ALLOWED_DOMAIN + "</h2>";
+      document.body.innerHTML = "<h2 style='color:red;text-align:center;margin-top:40px;'>❌ Access Denied! Only allowed from</h2>";
       throw new Error("Blocked: Invalid referrer");
     }
 
