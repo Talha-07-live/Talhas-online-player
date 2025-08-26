@@ -177,13 +177,6 @@
   </div>
 
   <script>
-    const ALLOWED_DOMAIN = "https://talhas.collection.page.gd", 
-      "https://talhasdownloader.talha07.workers.dev/";
-    if (!document.referrer.startsWith(ALLOWED_DOMAIN)) {
-      document.body.innerHTML = "<h2 style='color:red;text-align:center;margin-top:40px;'>❌ Access Denied! Only allowed from " + ALLOWED_DOMAIN + "</h2>";
-      throw new Error("Blocked: Invalid referrer");
-    }
-
     const keyString = "Talha<what!".padEnd(32);
     const encoder = new TextEncoder();
     const rawKey = encoder.encode(keyString);
